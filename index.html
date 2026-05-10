@@ -9,6 +9,80 @@
     <link rel="stylesheet" crossorigin href="/assets/index-DINq1MMa.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"></div>
+
+    <script>
+      (() => {
+        if (window.__pkmLiteHudMounted) return
+        window.__pkmLiteHudMounted = true
+
+        const hud = document.createElement('aside')
+        hud.setAttribute('aria-label', 'System HUD')
+        hud.style.position = 'fixed'
+        hud.style.right = '16px'
+        hud.style.top = '16px'
+        hud.style.zIndex = '70'
+        hud.style.width = '220px'
+        hud.style.padding = '10px 12px'
+        hud.style.border = '1px solid rgba(56, 189, 248, 0.35)'
+        hud.style.borderRadius = '12px'
+        hud.style.background = 'rgba(2, 6, 23, 0.82)'
+        hud.style.backdropFilter = 'blur(8px)'
+        hud.style.fontFamily = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace'
+        hud.style.fontSize = '11px'
+        hud.style.lineHeight = '1.5'
+        hud.style.color = 'rgba(186, 230, 253, 0.95)'
+        hud.style.pointerEvents = 'none'
+
+        const title = document.createElement('div')
+        title.textContent = 'SYSTEM HUD'
+        title.style.fontWeight = '700'
+        title.style.letterSpacing = '0.08em'
+        title.style.marginBottom = '6px'
+        title.style.color = 'rgba(125, 211, 252, 1)'
+
+        const body = document.createElement('div')
+        body.style.whiteSpace = 'pre-line'
+        body.textContent = 'Loading telemetry...'
+
+        hud.appendChild(title)
+        hud.appendChild(body)
+        document.body.appendChild(hud)
+
+        let frameCount = 0
+        let lastFrameTime = performance.now()
+        let fps = 0
+
+        const rafLoop = () => {
+          frameCount += 1
+          const now = performance.now()
+          if (now - lastFrameTime >= 1000) {
+            fps = Math.round((frameCount * 1000) / (now - lastFrameTime))
+            frameCount = 0
+            lastFrameTime = now
+          }
+          requestAnimationFrame(rafLoop)
+        }
+        requestAnimationFrame(rafLoop)
+
+        const pickValue = (label) => {
+          const match = document.body.innerText.match(new RegExp(`${label}\\s*:\\s*([^\\n]+)`))
+          return match ? match[1].trim() : 'N/A'
+        }
+
+        const updateHud = () => {
+          body.textContent = [
+            `Node: ${pickValue('ACTIVE NODE')}`,
+            `Mode: ${pickValue('CURRENT MODE')}`,
+            `Uptime: ${pickValue('UPTIME')}`,
+            `FPS: ${fps || 'N/A'}`,
+          ].join('\n')
+        }
+
+        updateHud()
+        setInterval(updateHud, 1200)
+      })()
+    </script>
+
   </body>
 </html>
