@@ -1,119 +1,170 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react'
+import { useReducedMotion } from 'framer-motion'
 
-export default function BinaryStream({ scrollVelocity = 0, focusMode = false }) {
-  const canvasRef = useRef(null);
-  const animationRef = useRef(null);
-  const binaryColumnsRef = useRef([]);
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function makeColumn(width, height, depth) {
+  return {
+    x: Math.random() * width,
+    y: Math.random() * (height + 240) - 180,
+    speed: (0.35 + Math.random() * 0.95) * depth,
+    drift: (Math.random() - 0.5) * 0.22 * depth,
+    alpha: 0.08 + Math.random() * 0.28,
+    size: 11 + Math.round(Math.random() * 4),
+    depth,
+    chars: Array.from({ length: 14 + Math.floor(Math.random() * 10) }, () => (Math.random() > 0.5 ? '0' : '1')),
+    glitchUntil: 0,
+    dissolveAt: performance.now() + 3000 + Math.random() * 5200,
+  }
+}
+
+export default function BinaryStream({
+  scrollVelocity = 0,
+  focusMode = false,
+  interactionBoost = 0,
+  pointer = { x: 0.5, y: 0.5 },
+  onLoad,
+}) {
+  const canvasRef = useRef(null)
+  const animationRef = useRef(null)
+  const stateRef = useRef({ columns: [], particles: [], width: 0, height: 0, frame: 0 })
+  const reducedMotion = useReducedMotion()
 
   useEffect(() => {
-    if (prefersReducedMotion) return;
+    if (reducedMotion) return
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const canvas = canvasRef.current
+    if (!canvas) return
 
-    const ctx = canvas.getContext('2d', { willReadFrequently: false });
-    if (!ctx) return;
+    const ctx = canvas.getContext('2d', { alpha: true })
+    if (!ctx) return
 
-    // Set canvas size with pixel ratio for crisp rendering
-    const dpr = window.devicePixelRatio || 1;
-    const rect = canvas.getBoundingClientRect();
-    canvas.width = rect.width * dpr;
-    canvas.height = rect.height * dpr;
-    ctx.scale(dpr, dpr);
+    let dpr = window.devicePixelRatio || 1
 
-    const width = rect.width;
-    const height = rect.height;
+    const rebuild = () => {
+      const rect = canvas.getBoundingClientRect()
+      const width = rect.width
+      const height = rect.height
 
-    // Initialize binary columns
-    const columnCount = Math.ceil(width / 40);
-    binaryColumnsRef.current = Array.from({ length: columnCount }, () => ({
-      x: Math.random() * width,
-      y: Math.random() * height * 2 - height,
-      speed: 0.5 + Math.random() * 1.5,
-      drift: (Math.random() - 0.5) * 0.32,
-      chars: Array.from({ length: 20 }, () => (Math.random() > 0.5 ? '0' : '1')),
-      opacity: Math.random() * 0.3 + 0.1,
-      offset: Math.random() * 50,
-    }));
+      canvas.width = Math.round(width * dpr)
+      canvas.height = Math.round(height * dpr)
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
-    let frameCount = 0;
+      const depthLayers = [0.75, 1, 1.28]
+      const columns = depthLayers.flatMap((depth) => {
+        const count = Math.max(8, Math.round((width / 80) * depth))
+        return Array.from({ length: count }, () => makeColumn(width, height, depth))
+      })
 
-    const drawBinary = () => {
-      frameCount++;
+      stateRef.current = {
+        ...stateRef.current,
+        width,
+        height,
+        columns,
+      }
+    }
 
-      // Clear with fade effect
-      ctx.fillStyle = 'rgba(5, 7, 10, 0.05)';
-      ctx.fillRect(0, 0, width, height);
+    rebuild()
 
-      const columns = binaryColumnsRef.current;
+    const render = () => {
+      const state = stateRef.current
+      const { width, height } = state
+      state.frame += 1
+      const now = performance.now()
 
-      columns.forEach((col, idx) => {
-        // Update position
-        col.y += col.speed;
-        col.x += col.drift + scrollVelocity * 0.02 * (idx % 2 === 0 ? 1 : -1);
-        if (col.y > height + 100) {
-          col.y = -100;
-          col.chars = Array.from({ length: 20 }, () => (Math.random() > 0.5 ? '0' : '1'));
-          col.opacity = Math.random() * 0.3 + 0.1;
-          col.x = Math.random() * width;
+      const activityGain = Math.min(1, interactionBoost * 0.7 + Math.min(1, scrollVelocity / 18) * 0.3)
+      const fade = 0.07 - activityGain * 0.02
+      ctx.fillStyle = `rgba(2, 5, 11, ${Math.max(0.03, fade)})`
+      ctx.fillRect(0, 0, width, height)
+
+      state.columns.forEach((column, index) => {
+        const pointerDx = pointer.x * width - column.x
+        const influence = Math.max(0, 1 - Math.abs(pointerDx) / 220)
+        const localSpeed = column.speed + scrollVelocity * 0.018 + influence * 0.22
+        column.y += localSpeed
+        column.x += column.drift + (index % 2 === 0 ? 1 : -1) * 0.03 * influence
+
+        if (column.y > height + 180 || column.x < -80 || column.x > width + 80) {
+          const next = makeColumn(width, height, column.depth)
+          next.y = -140
+          Object.assign(column, next)
         }
 
-        // Soft flicker
-        const flicker = Math.sin(frameCount * 0.1 + idx) * 0.15;
-        const alpha = Math.max(0.05, col.opacity + flicker + (focusMode ? 0.06 : 0));
-
-        // Draw binary characters
-        ctx.font = '14px "JetBrains Mono"';
-        ctx.fillStyle = `rgba(0, 229, 255, ${alpha * 0.6})`;
-        ctx.textAlign = 'center';
-
-        col.chars.forEach((char, i) => {
-          const charY = col.y + i * 18;
-          if (charY > -20 && charY < height + 20) {
-            ctx.fillText(char, col.x, charY);
+        if (now > column.dissolveAt && Math.random() > 0.88) {
+          const anchorY = column.y + column.chars.length * 7
+          for (let i = 0; i < 4; i += 1) {
+            state.particles.push({
+              x: column.x,
+              y: anchorY,
+              vx: (Math.random() - 0.5) * 0.8,
+              vy: -0.45 - Math.random() * 0.45,
+              ttl: 28 + Math.random() * 18,
+            })
           }
-        });
-
-        // Occasional bright character
-        if (Math.random() > 0.98) {
-          ctx.fillStyle = `rgba(0, 229, 255, 0.9)`;
-          const randomIdx = Math.floor(Math.random() * col.chars.length);
-          const randomY = col.y + randomIdx * 18;
-          ctx.fillText(col.chars[randomIdx], col.x, randomY);
+          column.dissolveAt = now + 3200 + Math.random() * 4200
         }
-      });
 
-      animationRef.current = requestAnimationFrame(drawBinary);
-    };
+        if (Math.random() > 0.995) {
+          column.glitchUntil = now + 100 + Math.random() * 150
+        }
 
-    drawBinary();
+        const glitching = now < column.glitchUntil
+        const baseAlpha = column.alpha + (focusMode ? 0.06 : 0) + activityGain * 0.07
+        const flicker = Math.sin(state.frame * 0.09 + index * 0.7) * 0.11
+        const glyphAlpha = Math.max(0.08, Math.min(0.92, baseAlpha + flicker))
 
-    const handleResize = () => {
-      const newRect = canvas.getBoundingClientRect();
-      canvas.width = newRect.width * dpr;
-      canvas.height = newRect.height * dpr;
-      ctx.scale(dpr, dpr);
-    };
+        ctx.font = `${column.size}px JetBrains Mono, monospace`
+        ctx.textAlign = 'center'
+        ctx.fillStyle = glitching ? 'rgba(133, 255, 242, 0.95)' : `rgba(0, 229, 255, ${glyphAlpha * 0.85})`
 
-    window.addEventListener('resize', handleResize);
+        for (let i = 0; i < column.chars.length; i += 1) {
+          if (Math.random() > 0.986) {
+            column.chars[i] = Math.random() > 0.5 ? '0' : '1'
+          }
+          const charY = column.y + i * (column.size + 3)
+          if (charY > -24 && charY < height + 24) {
+            const char = glitching && Math.random() > 0.72 ? (Math.random() > 0.5 ? '1' : '0') : column.chars[i]
+            ctx.fillText(char, column.x, charY)
+          }
+        }
+      })
+
+      state.particles = state.particles.filter((particle) => {
+        particle.x += particle.vx
+        particle.y += particle.vy
+        particle.ttl -= 1
+        ctx.fillStyle = `rgba(0, 229, 255, ${Math.max(0, particle.ttl / 40)})`
+        ctx.fillRect(particle.x, particle.y, 1.8, 1.8)
+        return particle.ttl > 0
+      })
+
+      if (onLoad) {
+        const binaryLoad = Math.min(1, (state.columns.length + state.particles.length * 0.5) / 90)
+        onLoad(binaryLoad)
+      }
+
+      animationRef.current = requestAnimationFrame(render)
+    }
+
+    render()
+
+    const onResize = () => {
+      dpr = window.devicePixelRatio || 1
+      rebuild()
+    }
+
+    window.addEventListener('resize', onResize)
 
     return () => {
-      window.removeEventListener('resize', handleResize);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [focusMode, prefersReducedMotion, scrollVelocity]);
+      window.removeEventListener('resize', onResize)
+      if (animationRef.current) cancelAnimationFrame(animationRef.current)
+    }
+  }, [focusMode, interactionBoost, onLoad, pointer.x, pointer.y, reducedMotion, scrollVelocity])
 
   return (
     <canvas
       ref={canvasRef}
-      className="fixed inset-0 pointer-events-none opacity-40"
-      style={{
-        zIndex: 0,
-        mixBlendMode: 'screen',
-      }}
+      className="binary-matrix fixed inset-0 pointer-events-none"
+      style={{ zIndex: 0, mixBlendMode: 'screen' }}
+      aria-hidden="true"
     />
-  );
+  )
 }

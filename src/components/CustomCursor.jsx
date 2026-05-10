@@ -6,12 +6,15 @@ export default function CustomCursor() {
   const rafRef = useRef(null);
   const pendingEventRef = useRef(null);
   const trailIdRef = useRef(0);
+  const mouseDownRef = useRef(false);
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [trail, setTrail] = useState([]);
+  const [prediction, setPrediction] = useState({ x: 0, y: 0 });
   const [scale, setScale] = useState(1);
   const [velocity, setVelocity] = useState(0);
   const [isHoveringInteractive, setIsHoveringInteractive] = useState(false);
+  const [cursorMode, setCursorMode] = useState('explore');
   const previousRef = useRef({ x: 0, y: 0 });
   const prefersReducedMotion = useReducedMotion();
 
@@ -28,18 +31,52 @@ export default function CustomCursor() {
         if (!event) return;
 
         const previous = previousRef.current;
-        const nextVelocity = Math.hypot(event.clientX - previous.x, event.clientY - previous.y);
-        previousRef.current = { x: event.clientX, y: event.clientY };
+        const vx = event.clientX - previous.x;
+        const vy = event.clientY - previous.y;
+        const nextVelocity = Math.hypot(vx, vy);
 
-        setPosition({ x: event.clientX, y: event.clientY });
+        const target = document.elementFromPoint(event.clientX, event.clientY);
+        const interactive = target?.matches('button, a, input, textarea, [role="button"], .interactive, [data-card-id]');
+        const terminal = target?.closest('[data-terminal]');
+        const draggable = target?.closest('[draggable="true"]');
+
+        let nextX = event.clientX;
+        let nextY = event.clientY;
+        if (interactive && target) {
+          const rect = target.getBoundingClientRect();
+          const cx = rect.left + rect.width / 2;
+          const cy = rect.top + rect.height / 2;
+          const dx = cx - event.clientX;
+          const dy = cy - event.clientY;
+          const distance = Math.hypot(dx, dy);
+          if (distance < 90) {
+            const pull = (1 - distance / 90) * 0.24;
+            nextX += dx * pull;
+            nextY += dy * pull;
+          }
+        }
+
+        previousRef.current = { x: nextX, y: nextY };
+
+        setPosition({ x: nextX, y: nextY });
+        setPrediction({ x: nextX + vx * 0.8, y: nextY + vy * 0.8 });
         setVelocity(nextVelocity);
         setIsVisible(true);
-        setTrail((current) => [{ x: event.clientX, y: event.clientY, id: trailIdRef.current += 1 }, ...current].slice(0, 5));
+        setTrail((current) => [{ x: nextX, y: nextY, id: trailIdRef.current += 1 }, ...current].slice(0, 7));
 
-        const element = document.elementFromPoint(event.clientX, event.clientY);
-        const isInteractive = element?.matches('button, a, input, textarea, [role="button"], .interactive');
-        setIsHoveringInteractive(!!isInteractive);
-        setScale(isInteractive ? 1.65 : 1 + Math.min(0.25, nextVelocity / 60));
+        setIsHoveringInteractive(!!interactive);
+        const dynamicScale = interactive ? 1.7 : 1 + Math.min(0.3, nextVelocity / 55);
+        setScale(dynamicScale);
+
+        if (terminal) {
+          setCursorMode('terminal');
+        } else if (draggable || (mouseDownRef.current && interactive)) {
+          setCursorMode('drag');
+        } else if (mouseDownRef.current) {
+          setCursorMode('click');
+        } else {
+          setCursorMode('explore');
+        }
       });
     };
 
@@ -47,12 +84,26 @@ export default function CustomCursor() {
       setIsVisible(false);
     };
 
+    const handleDown = () => {
+      mouseDownRef.current = true;
+      setCursorMode('click');
+    };
+
+    const handleUp = () => {
+      mouseDownRef.current = false;
+      setCursorMode('explore');
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('mousedown', handleDown);
+    window.addEventListener('mouseup', handleUp);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('mousedown', handleDown);
+      window.removeEventListener('mouseup', handleUp);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
   }, [prefersReducedMotion]);
@@ -88,6 +139,13 @@ export default function CustomCursor() {
           transition={{ duration: 0.35 + index * 0.06, ease: 'easeOut' }}
         />
       ))}
+
+      <motion.div
+        className="fixed pointer-events-none z-[9998] h-2.5 w-2.5 rounded-full border border-accent-cyan/55"
+        style={{ left: prediction.x - 5, top: prediction.y - 5 }}
+        animate={{ opacity: [0.45, 0.1, 0.45] }}
+        transition={{ duration: 0.5, repeat: Infinity }}
+      />
 
       <motion.div
         ref={cursorRef}
@@ -137,6 +195,10 @@ export default function CustomCursor() {
             }}
           />
         )}
+
+        <div className="pointer-events-none absolute left-1/2 top-[115%] -translate-x-1/2 rounded-md border border-accent-cyan/35 bg-black/65 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] text-accent-cyan/85">
+          {cursorMode}
+        </div>
       </motion.div>
     </>
   );

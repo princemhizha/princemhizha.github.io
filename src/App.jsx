@@ -7,6 +7,7 @@ import LanguageGrid from './components/LanguageGrid'
 import Container from './components/ui/Container'
 import Section from './components/ui/Section'
 import Tag from './components/ui/Tag'
+import BinaryStream from './components/BinaryStream'
 import CustomCursor from './components/CustomCursor'
 import AmbientLightingEngine from './components/AmbientLightingEngine'
 import TacticalGridOverlay from './components/TacticalGridOverlay'
@@ -16,6 +17,9 @@ import CommandPalette from './components/CommandPalette'
 import ArchitectureSchematic from './components/ArchitectureSchematic'
 import TerminalAssistant from './components/TerminalAssistant'
 import RuntimeSelfVisualizer from './components/RuntimeSelfVisualizer'
+import SkillConstellation from './components/SkillConstellation'
+import SystemStatusBar from './components/SystemStatusBar'
+import ProjectPreviewModal from './components/ProjectPreviewModal'
 import { deriveAdaptiveSignature, loadSignalWasm } from './utils/wasmSignals'
 
 const skills = [
@@ -199,6 +203,7 @@ function App() {
   const [hudVisible, setHudVisible] = useState(true)
   const [wasmRuntime, setWasmRuntime] = useState(null)
   const [sceneTilt, setSceneTilt] = useState({ x: 0, y: 0 })
+  const [activeProjectModal, setActiveProjectModal] = useState(null)
   const activeSectionRef = useRef('about')
   const focusTimeoutRef = useRef(null)
   const sectionEnteredAtRef = useRef(performance.now())
@@ -359,6 +364,11 @@ function App() {
   const publishTelemetry = useCallback((payload) => {
     setRuntimeTelemetry((current) => ({ ...current, ...payload }))
   }, [])
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--scroll-depth', scrollDepth.toFixed(3))
+    document.documentElement.style.setProperty('--env-energy', engagementBoost.toFixed(3))
+  }, [engagementBoost, scrollDepth])
 
   const prewarmSection = useCallback((sectionId) => {
     const section = document.getElementById(sectionId)
@@ -739,8 +749,22 @@ function App() {
   return (
     <div className={`relative min-h-screen overflow-x-clip bg-bg text-slate-100 ${idle ? 'low-power' : ''} ${focusMode ? 'focus-mode' : ''} ${engineeringMode ? 'engineering-mode' : ''} ${runtimeMode === 'showcase' ? 'showcase-mode' : ''} ${spatialMode ? 'spatial-mode' : ''} theme-${dynamicTheme}`}>
       <TerminalAssistant visible={true} onNavigate={handleTerminalNavigate} onSetMode={handleTerminalMode} />
+      <SystemStatusBar
+        activeSection={activeSection}
+        runtimeMode={runtimeMode}
+        viewedProjects={viewedProjects.length}
+        throughput={throughput}
+        engineeringMode={engineeringMode}
+      />
       
       {/* Lightweight Background Effects */}
+      <BinaryStream
+        scrollVelocity={scrollVelocity}
+        focusMode={focusMode}
+        interactionBoost={engagementBoost}
+        pointer={{ x: hoverBeacon.x, y: hoverBeacon.y }}
+        onLoad={(binaryLoad) => publishTelemetry({ binaryLoad })}
+      />
       <TacticalGridOverlay />
       <AmbientLightingEngine
         activeSection={activeSection}
@@ -839,9 +863,9 @@ function App() {
           <div className="text-center font-mono">
             <p className="terminal-label">BOOTSTRAP SEQUENCE</p>
             <p className="mt-2 text-sm text-accent-cyan/90">
-              {revealPhase === 0 && 'Stabilizing shader environment...'}
+              {revealPhase === 0 && 'Booting binary matrix...'}
               {revealPhase === 1 && 'Forming UI shell...'}
-              {revealPhase === 2 && 'Routing neural signal mesh...'}
+              {revealPhase === 2 && 'Routing interaction graph...'}
               {revealPhase >= 3 && 'Finalizing atmospheric locks...'}
             </p>
           </div>
@@ -874,7 +898,7 @@ function App() {
       <div style={sceneTransform}>
       <nav className={`sticky top-4 z-50 px-4 transition duration-500 ${prewarmNav ? 'scale-[1.01]' : ''}`}>
         <Container className="max-w-5xl px-0">
-          <div className="mx-auto flex w-full items-center justify-between rounded-xl border border-accent-cyan/30 bg-black/40 px-4 py-3 shadow-neon backdrop-blur-2xl sm:px-6">
+          <div className="nav-dock mx-auto flex w-full items-center justify-between rounded-xl border border-accent-cyan/30 bg-black/40 px-4 py-3 shadow-neon backdrop-blur-2xl sm:px-6">
             <a href="#" className="font-display text-sm font-bold tracking-widest uppercase text-accent-cyan">
               PKM
             </a>
@@ -976,10 +1000,17 @@ function App() {
                     aria-hidden="true"
                   />
                   <img
-                    src="/profile.png"
+                    src="/profile.jpg?v=20260511"
                     alt="Portrait of Prince Kudzai Mhizha"
                     className="relative aspect-[4/5] w-full rounded-xl object-cover object-top"
                   />
+
+                  <div className="identity-scan pointer-events-none absolute inset-4 rounded-xl" aria-hidden="true" />
+                  <div className="pointer-events-none absolute bottom-8 left-7 right-7 rounded-lg border border-accent-cyan/25 bg-black/45 p-2 backdrop-blur-sm">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-accent-cyan/80">Identity Verified</p>
+                    <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-slate-200">Frontend Systems Engineer</p>
+                    <p className="mt-1 font-mono text-[10px] uppercase tracking-[0.14em] text-slate-300">UI/UX Infrastructure Designer</p>
+                  </div>
                 </div>
               </motion.div>
             </div>
@@ -1009,7 +1040,9 @@ function App() {
           subtitle="Capabilities I use to design and ship trustworthy product experiences."
           reducedMotion={reducedMotion}
         >
-          <div className="grid gap-4 sm:grid-cols-2">
+          <SkillConstellation reducedMotion={reducedMotion} />
+
+          <div className="mt-5 grid gap-4 sm:grid-cols-2">
             {skills.map((group, index) => (
               <motion.div
                 key={group.title}
@@ -1021,32 +1054,11 @@ function App() {
                 <Card className="h-full">
                   <h3 className="font-display text-lg font-semibold text-white">{group.title}</h3>
                   <p className="mt-2 text-sm text-slate-300">{group.description}</p>
-                  <motion.div
-                    className="mt-4 flex flex-wrap gap-2"
-                    initial="hidden"
-                    whileInView="show"
-                    viewport={{ once: true, amount: 0.25 }}
-                    variants={{
-                      hidden: {},
-                      show: {
-                        transition: {
-                          staggerChildren: 0.05,
-                        },
-                      },
-                    }}
-                  >
+                  <div className="mt-4 flex flex-wrap gap-2">
                     {group.tags.map((tag) => (
-                      <motion.div
-                        key={tag}
-                        variants={{
-                          hidden: { opacity: 0, y: reducedMotion ? 0 : 6 },
-                          show: { opacity: 1, y: 0, transition: { duration: 0.25 } },
-                        }}
-                      >
-                        <Tag>{tag}</Tag>
-                      </motion.div>
+                      <Tag key={tag}>{tag}</Tag>
                     ))}
-                  </motion.div>
+                  </div>
                 </Card>
               </motion.div>
             ))}
@@ -1114,6 +1126,17 @@ function App() {
                       </motion.div>
                     ))}
                   </motion.div>
+
+                  <div className="mt-5 flex items-center justify-between">
+                    <p className="font-mono text-[11px] uppercase tracking-[0.17em] text-accent-cyan/70">Immersive Preview Ready</p>
+                    <button
+                      type="button"
+                      className="interactive rounded-lg border border-accent-cyan/45 bg-accent-cyan/8 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.15em] text-accent-cyan transition hover:border-accent-cyan hover:bg-accent-cyan/15"
+                      onClick={() => setActiveProjectModal(project)}
+                    >
+                      Open Node
+                    </button>
+                  </div>
                 </Card>
               </motion.div>
             ))}
@@ -1173,6 +1196,27 @@ function App() {
           </Card>
         </Section>
       </main>
+
+      <footer className="relative z-10 px-4 pb-12 pt-4">
+        <Container className="max-w-5xl px-0">
+          <div className="rounded-xl border border-accent-cyan/30 bg-black/45 p-4 backdrop-blur-xl sm:p-5">
+            <p className="terminal-label">SYSTEM FOOTER NODE</p>
+            <div className="mt-3 grid gap-3 font-mono text-[11px] uppercase tracking-[0.15em] text-slate-300 sm:grid-cols-2 lg:grid-cols-4">
+              <p>SYSTEM NODE: ACTIVE</p>
+              <p>LAST DEPLOYMENT: SUCCESSFUL</p>
+              <p>NETWORK STATUS: STABLE</p>
+              <p>RUNTIME MODE: {runtimeMode}</p>
+            </div>
+          </div>
+        </Container>
+      </footer>
+
+      <ProjectPreviewModal
+        project={activeProjectModal}
+        open={Boolean(activeProjectModal)}
+        onClose={() => setActiveProjectModal(null)}
+        reducedMotion={reducedMotion}
+      />
       </div>
     </div>
   )
