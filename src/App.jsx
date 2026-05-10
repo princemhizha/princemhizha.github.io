@@ -7,24 +7,14 @@ import LanguageGrid from './components/LanguageGrid'
 import Container from './components/ui/Container'
 import Section from './components/ui/Section'
 import Tag from './components/ui/Tag'
-import BinaryStream from './components/BinaryStream'
-import DigitalFog from './components/DigitalFog'
 import CustomCursor from './components/CustomCursor'
-import ShaderField from './components/ShaderField'
-import NeuralNetworkLayer from './components/NeuralNetworkLayer'
-import DataStreamLayer from './components/DataStreamLayer'
 import AmbientLightingEngine from './components/AmbientLightingEngine'
 import TacticalGridOverlay from './components/TacticalGridOverlay'
 import TelemetryHud from './components/TelemetryHud'
 import AIAssistantOrb from './components/AIAssistantOrb'
 import CommandPalette from './components/CommandPalette'
-import SystemTimeline from './components/SystemTimeline'
 import ArchitectureSchematic from './components/ArchitectureSchematic'
-import ParticleIntelligenceLayer from './components/ParticleIntelligenceLayer'
 import TerminalAssistant from './components/TerminalAssistant'
-import GpuFieldLayer from './components/GpuFieldLayer'
-import WorkerFieldLayer from './components/WorkerFieldLayer'
-import NeuralInteractionGraph from './components/NeuralInteractionGraph'
 import RuntimeSelfVisualizer from './components/RuntimeSelfVisualizer'
 import { deriveAdaptiveSignature, loadSignalWasm } from './utils/wasmSignals'
 
@@ -748,72 +738,9 @@ function App() {
 
   return (
     <div className={`relative min-h-screen overflow-x-clip bg-bg text-slate-100 ${idle ? 'low-power' : ''} ${focusMode ? 'focus-mode' : ''} ${engineeringMode ? 'engineering-mode' : ''} ${runtimeMode === 'showcase' ? 'showcase-mode' : ''} ${spatialMode ? 'spatial-mode' : ''} theme-${dynamicTheme}`}>
-        <TerminalAssistant visible={true} onNavigate={handleTerminalNavigate} onSetMode={handleTerminalMode} />
-      {effectProfile.tier !== 'low-power' && (
-        <WorkerFieldLayer
-          reducedMotion={reducedMotion}
-          quality={effectProfile.tier}
-          interactionBoost={engagementBoost}
-          activeSection={activeSection}
-          runtimeMode={runtimeMode}
-          hoverBeacon={hoverBeacon}
-          onTelemetry={publishTelemetry}
-        />
-      )}
-      <ShaderField reducedMotion={reducedMotion} interactionBoost={engagementBoost} quality={effectProfile.tier} />
-      <GpuFieldLayer
-        reducedMotion={reducedMotion}
-        quality={effectProfile.tier}
-        activeSection={activeSection}
-        interactionBoost={engagementBoost}
-        hoverBeacon={hoverBeacon}
-        scrollVelocity={scrollVelocity}
-        focusMode={focusMode}
-        engineeringMode={engineeringMode}
-        adaptiveScore={aiAdaptation.adaptiveScore}
-        frequencies={frequencies}
-      />
-      <DataStreamLayer reducedMotion={reducedMotion} throughput={throughput} quality={effectProfile.tier} density={effectProfile.streamDensity} />
-      <BinaryStream scrollVelocity={scrollVelocity * aiAdaptation.motionScale} focusMode={focusMode} />
-      <DigitalFog
-        activeSection={activeSection}
-        interactionBoost={engagementBoost}
-        reducedMotion={reducedMotion}
-        quality={effectProfile.tier}
-        density={effectProfile.fogDensity}
-      />
-      <NeuralNetworkLayer
-        reducedMotion={reducedMotion}
-        activeSection={activeSection}
-        interactionBoost={engagementBoost}
-        quality={effectProfile.tier}
-        density={effectProfile.networkDensity}
-        frequencies={frequencies}
-      />
-      <ParticleIntelligenceLayer
-        reducedMotion={reducedMotion}
-        activeSection={activeSection}
-        interactionBoost={engagementBoost}
-        hoverBeacon={hoverBeacon}
-        scrollVelocity={scrollVelocity}
-        focusMode={focusMode}
-        engineeringMode={engineeringMode}
-        quality={effectProfile.tier}
-        frequencies={frequencies}
-      />
-      {displayNeuralOverlay && (
-        <NeuralInteractionGraph
-          reducedMotion={reducedMotion}
-          interactionTrail={interactionTrail}
-          activeSection={activeSection}
-          interactionBoost={engagementBoost}
-          engineeringMode={engineeringMode}
-          hoverBeacon={hoverBeacon}
-          readingFlow={readingFlow}
-          navigationPattern={navigationPattern}
-          frequencies={frequencies}
-        />
-      )}
+      <TerminalAssistant visible={true} onNavigate={handleTerminalNavigate} onSetMode={handleTerminalMode} />
+      
+      {/* Lightweight Background Effects */}
       <TacticalGridOverlay />
       <AmbientLightingEngine
         activeSection={activeSection}
@@ -824,19 +751,21 @@ function App() {
         engineeringMode={engineeringMode}
         adaptation={aiAdaptation}
       />
+      
+      {/* UI Overlays & System Components */}
       {effectProfile.tier !== 'low-power' && <CustomCursor />}
-      {effectProfile.tier !== 'low-power' && (
-        <ArchitectureSchematic
-          engineeringMode={engineeringMode}
-          focusMode={focusMode}
-          viewedSections={viewedSections}
-          throughput={throughput}
-          predictedSections={predictedSections}
-          workerLoad={runtimeTelemetry.workerLoad}
-          packetRate={runtimeTelemetry.packetRate}
-          dynamicTheme={dynamicTheme}
-        />
-      )}
+      
+      <ArchitectureSchematic
+        engineeringMode={engineeringMode}
+        focusMode={focusMode}
+        viewedSections={viewedSections}
+        throughput={throughput}
+        predictedSections={predictedSections}
+        workerLoad={runtimeTelemetry.workerLoad}
+        packetRate={runtimeTelemetry.packetRate}
+        dynamicTheme={dynamicTheme}
+      />
+      
       {hudVisible && (
         <TelemetryHud
           activeSection={activeSection}
@@ -859,6 +788,7 @@ function App() {
           onClose={() => setHudVisible(false)}
         />
       )}
+      
       <RuntimeSelfVisualizer
         visible={displayNeuralOverlay}
         activeSection={activeSection}
@@ -869,12 +799,14 @@ function App() {
         frequencies={frequencies}
         sessionAgeMs={runtimeTelemetry.sessionAgeMs}
       />
+      
       <AIAssistantOrb
         onOpenCommand={() => setCommandOpen(true)}
         interactionBoost={engagementBoost}
         engineeringMode={engineeringMode}
         focusMode={focusMode}
       />
+      
       <CommandPalette
         open={commandOpen}
         onClose={() => setCommandOpen(false)}
@@ -1070,8 +1002,6 @@ function App() {
             </p>
           </Card>
         </Section>
-
-        <SystemTimeline reducedMotion={reducedMotion} engineeringMode={engineeringMode} viewed={viewedSections.includes('timeline')} />
 
         <Section
           id="skills"
