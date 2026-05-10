@@ -5,9 +5,9 @@ function Tag({ children }) {
 
   return (
     <motion.span
-      className="rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-medium text-accent-soft transition-[border-color,box-shadow,transform] duration-200 hover:border-accent/60 hover:shadow-[0_0_0_1px_rgba(34,211,238,0.28)]"
-      whileHover={reducedMotion ? {} : { y: -1, scale: 1.025 }}
-      transition={{ type: 'spring', stiffness: 320, damping: 20 }}
+      className="rounded-full border border-accent-cyan/40 bg-accent-cyan/8 px-3 py-1 text-xs font-semibold text-accent-cyan transition-all duration-200 font-mono uppercase tracking-wider hover:border-accent-cyan/70 hover:bg-accent-cyan/15 hover:shadow-neon"
+      whileHover={reducedMotion ? {} : { y: -2, scale: 1.05 }}
+      transition={{ type: 'spring', stiffness: 350, damping: 22 }}
     >
       {children}
     </motion.span>

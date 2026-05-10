@@ -21,25 +21,25 @@ const technologies = [
 ]
 
 const tierStyles = {
-  Advanced: 'border-accent/30 bg-accent/10 text-accent-soft',
-  Proficient: 'border-violet-400/30 bg-violet-400/10 text-violet-200',
-  Working: 'border-white/15 bg-white/5 text-slate-300',
+  Advanced: 'border-accent-cyan/50 bg-accent-cyan/15 text-accent-cyan shadow-neon',
+  Proficient: 'border-accent-teal/40 bg-accent-teal/10 text-accent-teal',
+  Working: 'border-accent-violet/30 bg-accent-violet/8 text-accent-violet',
 }
 
 function LanguageGrid() {
   const reducedMotion = useReducedMotion()
 
   return (
-    <section aria-labelledby="languages-tools-heading" className="mt-10 sm:mt-12">
-      <div className="mb-5 sm:mb-6">
+    <section aria-labelledby="languages-tools-heading" className="mt-12 sm:mt-14">
+      <div className="mb-8 sm:mb-10">
         <h3
           id="languages-tools-heading"
-          className="font-display text-xl font-semibold tracking-tight text-white sm:text-2xl"
+          className="font-display text-2xl sm:text-3xl font-bold tracking-tight text-white"
         >
           Languages & Tools
         </h3>
-        <p className="mt-2 max-w-2xl text-sm text-slate-300 sm:text-base">
-          A compact view of the technologies and systems I use to move product ideas into reliable,
+        <p className="mt-3 max-w-2xl text-slate-300 font-light leading-relaxed">
+          A tactical overview of the technologies and systems I use to move product ideas into reliable,
           production-ready experiences.
         </p>
       </div>
@@ -49,32 +49,37 @@ function LanguageGrid() {
           <motion.li
             key={tech.name}
             className="list-none"
-            initial={{ opacity: 0, y: reducedMotion ? 0 : 8 }}
+            initial={{ opacity: 0, y: reducedMotion ? 0 : 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.15 }}
-            transition={{ duration: 0.32, delay: index * 0.035 }}
+            transition={{ duration: 0.4, delay: index * 0.03 }}
           >
             <motion.article
               tabIndex={0}
-              className="group glass-panel flex h-full min-h-[132px] flex-col justify-between rounded-2xl border border-white/10 bg-white/5 p-4 outline-none transition-[border-color,box-shadow,transform] duration-200 focus-visible:border-accent/60 focus-visible:shadow-neon sm:min-h-[144px]"
-              whileHover={reducedMotion ? {} : { y: -4, scale: 1.01 }}
-              transition={{ type: 'spring', stiffness: 280, damping: 22 }}
+              className="group cyber-card relative flex h-full min-h-[140px] flex-col justify-between rounded-xl p-4 outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan sm:min-h-[156px]"
+              whileHover={reducedMotion ? {} : { y: -6, scale: 1.03 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 24 }}
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-slate-950/50 text-sm font-semibold tracking-[0.18em] text-accent-soft shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] transition-colors duration-200 group-hover:border-accent/40 group-hover:bg-accent/10 group-focus-visible:border-accent/40 group-focus-visible:bg-accent/10">
+                <motion.div
+                  className="flex h-10 w-10 items-center justify-center rounded-lg border border-accent-cyan/40 bg-gradient-to-br from-accent-cyan/20 to-accent-teal/10 text-xs font-bold tracking-widest text-accent-cyan font-mono"
+                  whileHover={reducedMotion ? {} : { scale: 1.1, rotateZ: 5 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                >
                   {tech.badge}
-                </div>
-                <span
-                  className={`rounded-full border px-2.5 py-1 text-[11px] font-medium ${tierStyles[tech.level]}`}
+                </motion.div>
+                <motion.span
+                  className={`rounded-full border px-2 py-1 text-[10px] font-bold uppercase tracking-wider font-mono transition-all ${tierStyles[tech.level]}`}
+                  whileHover={reducedMotion ? {} : { scale: 1.08 }}
                 >
                   {tech.level}
-                </span>
+                </motion.span>
               </div>
 
-              <div className="mt-5">
+              <div className="mt-4">
                 <h4 className="text-sm font-semibold text-white sm:text-base">{tech.name}</h4>
-                <p className="mt-1 text-xs uppercase tracking-[0.16em] text-slate-400">
-                  Language / Tooling
+                <p className="mt-1.5 text-xs uppercase tracking-widest text-accent-cyan/50 font-mono">
+                  Tech Stack
                 </p>
               </div>
             </motion.article>

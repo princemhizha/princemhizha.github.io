@@ -1,20 +1,64 @@
 import { motion, useReducedMotion } from 'framer-motion'
+import { useState } from 'react'
 
 function Card({ children, className = '' }) {
   const reducedMotion = useReducedMotion()
+  const [rotationX, setRotationX] = useState(0)
+  const [rotationY, setRotationY] = useState(0)
+
+  const handleMouseMove = (e) => {
+    if (reducedMotion) return
+
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = (e.clientY - rect.top - rect.height / 2) / 10
+    const y = (e.clientX - rect.left - rect.width / 2) / 10
+
+    setRotationX(x)
+    setRotationY(-y)
+  }
+
+  const handleMouseLeave = () => {
+    setRotationX(0)
+    setRotationY(0)
+  }
 
   return (
-    <motion.article
-      className={`group glass-panel relative h-full overflow-hidden border-white/10 bg-white/[0.045] p-6 shadow-[0_12px_32px_rgba(6,14,36,0.42)] transition-[border-color,box-shadow,transform] duration-300 hover:border-accent/45 hover:shadow-[0_0_0_1px_rgba(34,211,238,0.28),0_20px_42px_rgba(6,14,36,0.62)] ${className}`}
-      whileHover={reducedMotion ? {} : { y: -6, scale: 1.012 }}
-      transition={{ type: 'spring', stiffness: 260, damping: 22 }}
+    <motion.div
+      className="h-full perspective"
+      style={{
+        perspective: '1000px',
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_20%_0%,rgba(34,211,238,0.15),transparent_45%),radial-gradient(circle_at_90%_100%,rgba(167,139,250,0.12),transparent_52%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-      />
-      <div className="relative">{children}</div>
-    </motion.article>
+      <motion.article
+        className={`group cyber-card relative h-full overflow-hidden p-6 ${className}`}
+        whileHover={reducedMotion ? {} : { y: -8, scale: 1.02 }}
+        animate={
+          reducedMotion
+            ? {}
+            : {
+                rotateX: rotationX,
+                rotateY: rotationY,
+              }
+        }
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      >
+        {/* Glow gradient overlay */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-br from-accent-cyan/0 via-transparent to-accent-teal/0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+        />
+
+        {/* Corner glow effects */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute -top-1/2 -right-1/2 w-full h-full rounded-full bg-accent-cyan/20 blur-3xl opacity-0 group-hover:opacity-30 transition-opacity duration-500"
+        />
+
+        <div className="relative z-10">{children}</div>
+      </motion.article>
+    </motion.div>
   )
 }
 

@@ -7,6 +7,9 @@ import LanguageGrid from './components/LanguageGrid'
 import Container from './components/ui/Container'
 import Section from './components/ui/Section'
 import Tag from './components/ui/Tag'
+import BinaryStream from './components/BinaryStream'
+import DigitalFog from './components/DigitalFog'
+import CustomCursor from './components/CustomCursor'
 
 const skills = [
   {
@@ -184,45 +187,53 @@ function App() {
 
   return (
     <div className="relative min-h-screen overflow-x-clip bg-bg text-slate-100">
-      <div aria-hidden="true" className="mesh-overlay pointer-events-none absolute inset-0 opacity-75" />
+      {/* Background layer components */}
+      <BinaryStream />
+      <DigitalFog />
+      <CustomCursor />
+
+      {/* Atmospheric mesh overlay */}
+      <div aria-hidden="true" className="mesh-overlay pointer-events-none fixed inset-0 opacity-40" />
+
+      {/* Floating glowing orbs with cyberpunk colors */}
       <motion.div
         aria-hidden="true"
-        className="floating-orb pointer-events-none absolute -top-24 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-accent/25 blur-3xl"
-        animate={reducedMotion ? {} : { x: [0, -10, 8, 0], y: [0, 8, -6, 0] }}
+        className="floating-orb pointer-events-none fixed -top-32 left-1/4 h-96 w-96 rounded-full bg-accent-cyan/15 blur-3xl"
+        animate={reducedMotion ? {} : { x: [0, -15, 8, 0], y: [0, 12, -8, 0] }}
         transition={floatTransition}
       />
       <motion.div
         aria-hidden="true"
-        className="floating-orb pointer-events-none absolute right-0 top-1/3 h-72 w-72 rounded-full bg-accent-secondary/20 blur-3xl"
+        className="floating-orb pointer-events-none fixed right-0 top-1/3 h-80 w-80 rounded-full bg-accent-teal/10 blur-3xl"
         animate={reducedMotion ? {} : { x: [0, -12, 0], y: [0, -10, 0] }}
         transition={{ ...floatTransition, duration: 24 }}
       />
       <motion.div
         aria-hidden="true"
-        className="floating-orb pointer-events-none absolute -left-10 bottom-1/4 h-64 w-64 rounded-full bg-cyan-300/10 blur-3xl"
+        className="floating-orb pointer-events-none fixed -left-20 bottom-1/4 h-72 w-72 rounded-full bg-accent-violet/8 blur-3xl"
         animate={reducedMotion ? {} : { x: [0, 12, 0], y: [0, -8, 0] }}
         transition={{ ...floatTransition, duration: 26 }}
       />
 
       <nav className="sticky top-4 z-50 px-4">
         <Container className="max-w-5xl px-0">
-          <div className="mx-auto flex w-full items-center justify-between rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 shadow-[0_14px_36px_rgba(4,10,28,0.38)] backdrop-blur-xl sm:px-6">
-            <a href="#" className="font-display text-sm font-semibold tracking-[0.12em] text-slate-100">
+          <div className="mx-auto flex w-full items-center justify-between rounded-xl border border-accent-cyan/30 bg-black/40 px-4 py-3 shadow-neon backdrop-blur-2xl sm:px-6">
+            <a href="#" className="font-display text-sm font-bold tracking-widest uppercase text-accent-cyan">
               PKM
             </a>
-            <ul className="flex items-center gap-1 rounded-xl border border-white/10 bg-white/[0.03] p-1">
+            <ul className="flex items-center gap-1 rounded-lg border border-accent-cyan/20 bg-black/30 p-1.5">
               {navItems.map((item) => (
                 <li key={item.id} className="list-none">
                   <a
                     href={`#${item.id}`}
-                    className={`nav-link-underline relative inline-flex rounded-lg px-3 py-1.5 text-xs font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft sm:text-sm ${
-                      activeSection === item.id ? 'text-white' : 'text-slate-300 hover:text-slate-100'
+                    className={`nav-link-underline relative inline-flex rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan sm:text-sm ${
+                      activeSection === item.id ? 'text-accent-cyan' : 'text-slate-300 hover:text-accent-cyan'
                     }`}
                   >
                     {activeSection === item.id && (
                       <motion.span
                         layoutId="active-nav-indicator"
-                        className="absolute inset-0 -z-10 rounded-lg border border-cyan-300/35 bg-cyan-300/10"
+                        className="absolute inset-0 -z-10 rounded-lg border border-accent-cyan/50 bg-accent-cyan/10"
                         transition={{ type: 'spring', stiffness: 320, damping: 28 }}
                       />
                     )}
@@ -235,18 +246,26 @@ function App() {
         </Container>
       </nav>
 
-      <header className="relative bg-hero-radial pb-16 pt-10 sm:pb-24 sm:pt-14">
+      <header className="relative pb-20 pt-12 sm:pb-28 sm:pt-16">
         <Container>
           <motion.div
-            initial={{ opacity: 0, y: reducedMotion ? 0 : 10 }}
+            initial={{ opacity: 0, y: reducedMotion ? 0 : 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="glass-panel relative overflow-hidden border-white/15 bg-white/[0.055] p-8 shadow-[0_18px_52px_rgba(2,9,26,0.55)] sm:p-12"
+            transition={{ duration: 0.6, ease: 'easeOut' }}
+            className="cyber-card relative overflow-hidden border-accent-cyan/40 p-8 sm:p-12"
           >
+            {/* Cyberpunk gradient overlay */}
             <div
-              className="absolute inset-0 bg-[radial-gradient(circle_at_6%_8%,rgba(34,211,238,0.18),transparent_40%),radial-gradient(circle_at_92%_14%,rgba(167,139,250,0.14),transparent_34%),linear-gradient(to_bottom_right,rgba(255,255,255,0.08),transparent)]"
+              className="absolute inset-0 bg-gradient-to-br from-accent-cyan/10 via-transparent to-accent-teal/10"
               aria-hidden="true"
             />
+
+            {/* Corner glow effects */}
+            <div
+              className="absolute -top-1/2 -right-1/2 w-full h-full rounded-full bg-accent-cyan/20 blur-3xl"
+              aria-hidden="true"
+            />
+
             <div className="relative grid items-center gap-10 lg:grid-cols-[minmax(0,1.45fr)_minmax(280px,0.8fr)]">
               <motion.div
                 variants={heroContainerVariants}
@@ -256,33 +275,36 @@ function App() {
               >
                 <motion.span
                   variants={heroItemVariants}
-                  className="inline-flex items-center rounded-full border border-accent/30 bg-accent/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-accent-soft"
+                  className="inline-flex items-center rounded-full border border-accent-cyan/50 bg-accent-cyan/10 px-3 py-1 text-xs font-bold uppercase tracking-widest text-accent-cyan font-mono"
                 >
-                  UI/UX Engineer | Software Developer
+                  UI/UX Engineer | Developer
                 </motion.span>
+
                 <motion.h1
                   variants={heroItemVariants}
-                  className="mt-6 font-display text-5xl font-bold leading-[1.05] tracking-tight text-white sm:text-7xl"
+                  className="mt-8 font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight text-white"
                 >
-                  <span className="bg-gradient-to-r from-cyan-200 via-cyan-300 to-violet-300 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-accent-cyan via-accent-teal to-accent-cyan bg-clip-text text-transparent">
                     Prince Kudzai Mhizha
                   </span>
                 </motion.h1>
-                <motion.p variants={heroItemVariants} className="mt-4 text-sm font-medium text-slate-200 sm:text-base">
-                  Degree: Computer Science
+
+                <motion.p variants={heroItemVariants} className="mt-5 text-sm font-semibold text-accent-cyan/80 font-mono">
+                  Computer Science | Zimbabwe
                 </motion.p>
-                <motion.p variants={heroItemVariants} className="mt-2 max-w-3xl text-sm text-slate-300 sm:text-base">
-                  UI/UX Engineer | Software Developer | Leader | Climate Action Fellow | Building Sustainable
-                  Solutions | Tech & Innovation Enthusiast
+
+                <motion.p variants={heroItemVariants} className="mt-3 max-w-3xl text-base text-slate-200 leading-relaxed">
+                  Building intuitive, accessible, and performance-driven digital experiences that solve real problems with elegant systems thinking.
                 </motion.p>
-                <motion.div variants={heroItemVariants} className="mt-6">
+
+                <motion.div variants={heroItemVariants} className="mt-8">
                   <AnimatedTagline reducedMotion={reducedMotion} />
                 </motion.div>
 
-                <motion.div variants={heroItemVariants} className="mt-8 flex flex-wrap gap-3">
-                  <Button href="#projects">View Projects</Button>
+                <motion.div variants={heroItemVariants} className="mt-10 flex flex-wrap gap-3">
+                  <Button href="#projects">Explore Work</Button>
                   <Button href="#contact" variant="ghost">
-                    Contact
+                    Get In Touch
                   </Button>
                 </motion.div>
               </motion.div>
@@ -290,16 +312,19 @@ function App() {
               <motion.div
                 className="mx-auto w-full max-w-sm lg:max-w-none"
                 style={{ y: reducedMotion ? 0 : heroImageParallaxY }}
-                initial={{ opacity: 0, scale: reducedMotion ? 1 : 0.96, y: reducedMotion ? 0 : 10 }}
+                initial={{ opacity: 0, scale: reducedMotion ? 1 : 0.96, y: reducedMotion ? 0 : 16 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
-                transition={{ duration: 0.55, delay: 0.12, ease: 'easeOut' }}
+                transition={{ duration: 0.6, delay: 0.2, ease: 'easeOut' }}
               >
-                <div className="glass-panel relative overflow-hidden rounded-[1.75rem] border-white/15 p-3 shadow-neon">
-                  <div className="absolute inset-x-6 top-0 h-24 rounded-full bg-accent/20 blur-3xl" aria-hidden="true" />
+                <div className="cyber-card relative overflow-hidden rounded-2xl border-accent-cyan/40 p-4">
+                  <div
+                    className="absolute inset-x-4 top-0 h-28 rounded-full bg-accent-cyan/30 blur-3xl"
+                    aria-hidden="true"
+                  />
                   <img
                     src="/profile.png"
                     alt="Portrait of Prince Kudzai Mhizha"
-                    className="relative aspect-[4/5] w-full rounded-[1.2rem] object-cover object-top"
+                    className="relative aspect-[4/5] w-full rounded-xl object-cover object-top"
                   />
                 </div>
               </motion.div>
@@ -396,8 +421,8 @@ function App() {
                   <p className="mt-2 text-sm text-slate-300">{project.scope}</p>
                   <ul className="mt-4 space-y-2 text-sm text-slate-200">
                     {project.bullets.map((bullet) => (
-                      <li key={bullet} className="flex gap-2">
-                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-accent-soft" aria-hidden="true" />
+                      <li key={bullet} className="flex gap-3">
+                        <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-accent-cyan/70 shadow-neon" aria-hidden="true" />
                         <span>{bullet}</span>
                       </li>
                     ))}
@@ -437,7 +462,7 @@ function App() {
         <Section
           id="contact"
           title="Contact"
-          subtitle="Open to collaborating on product teams where interface quality directly impacts trust and operational speed."
+          subtitle="Let's collaborate on products where thoughtful design meets engineering excellence."
           reducedMotion={reducedMotion}
         >
           <Card>
@@ -469,16 +494,16 @@ function App() {
                   href={item.href}
                   target={item.href.startsWith('mailto:') ? undefined : '_blank'}
                   rel={item.href.startsWith('mailto:') ? undefined : 'noreferrer'}
-                  className="group inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-2 text-sm text-slate-100 transition duration-200 hover:border-accent/60 hover:shadow-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-soft"
+                  className="group inline-flex items-center gap-2 rounded-lg border border-accent-cyan/40 bg-accent-cyan/5 px-4 py-2 text-sm text-accent-cyan font-semibold transition duration-300 hover:border-accent-cyan/80 hover:bg-accent-cyan/15 hover:shadow-neon focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan"
                   aria-label={item.label}
-                  whileHover={reducedMotion ? {} : { y: -2, scale: 1.02 }}
-                  whileTap={reducedMotion ? {} : { y: 0, scale: 0.985 }}
-                  transition={{ type: 'spring', stiffness: 310, damping: 22 }}
+                  whileHover={reducedMotion ? {} : { y: -3, scale: 1.05 }}
+                  whileTap={reducedMotion ? {} : { y: -1, scale: 0.98 }}
+                  transition={{ type: 'spring', stiffness: 350, damping: 22 }}
                 >
                   <item.icon
-                    size={16}
+                    size={18}
                     aria-hidden="true"
-                    className="transition-transform duration-200 group-hover:scale-110 group-hover:text-cyan-200"
+                    className="transition-transform duration-300 group-hover:scale-125 group-hover:drop-shadow-lg"
                   />
                   <span>{item.label}</span>
                 </motion.a>
