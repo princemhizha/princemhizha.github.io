@@ -15,6 +15,7 @@ import TelemetryHud from './components/TelemetryHud'
 import AIAssistantOrb from './components/AIAssistantOrb'
 import CommandPalette from './components/CommandPalette'
 import ArchitectureSchematic from './components/ArchitectureSchematic'
+import SystemTimeline from './components/SystemTimeline'
 import TerminalAssistant from './components/TerminalAssistant'
 import RuntimeSelfVisualizer from './components/RuntimeSelfVisualizer'
 import SkillConstellation from './components/SkillConstellation'
@@ -200,7 +201,7 @@ function App() {
     sessionAgeMs: 0,
     particles: 0,
   })
-  const [hudVisible, setHudVisible] = useState(true)
+  const [hudVisible, setHudVisible] = useState(false)
   const [wasmRuntime, setWasmRuntime] = useState(null)
   const [sceneTilt, setSceneTilt] = useState({ x: 0, y: 0 })
   const [activeProjectModal, setActiveProjectModal] = useState(null)
@@ -779,16 +780,18 @@ function App() {
       {/* UI Overlays & System Components */}
       {effectProfile.tier !== 'low-power' && <CustomCursor />}
       
-      <ArchitectureSchematic
-        engineeringMode={engineeringMode}
-        focusMode={focusMode}
-        viewedSections={viewedSections}
-        throughput={throughput}
-        predictedSections={predictedSections}
-        workerLoad={runtimeTelemetry.workerLoad}
-        packetRate={runtimeTelemetry.packetRate}
-        dynamicTheme={dynamicTheme}
-      />
+      {engineeringMode && (
+        <ArchitectureSchematic
+          engineeringMode={engineeringMode}
+          focusMode={focusMode}
+          viewedSections={viewedSections}
+          throughput={throughput}
+          predictedSections={predictedSections}
+          workerLoad={runtimeTelemetry.workerLoad}
+          packetRate={runtimeTelemetry.packetRate}
+          dynamicTheme={dynamicTheme}
+        />
+      )}
       
       {hudVisible && (
         <TelemetryHud
@@ -1025,14 +1028,50 @@ function App() {
           subtitle="I work across product strategy, interaction design, and implementation to deliver interfaces that hold up under real operational pressure."
           reducedMotion={reducedMotion}
         >
-          <Card>
-            <p className="text-sm leading-7 text-slate-200 sm:text-base">
-              My approach combines systems thinking with practical engineering. I focus on accessibility,
-              predictable interaction patterns, and measurable product outcomes. I collaborate closely with
-              product, design, and risk teams to move from discovery to production without losing intent.
-            </p>
-          </Card>
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+            <Card className="overflow-hidden">
+              <div className="relative overflow-hidden rounded-xl">
+                <img
+                  src="/profile.jpg?v=20260511"
+                  alt="Recent portrait of Prince Kudzai Mhizha"
+                  className="aspect-[4/5] w-full rounded-xl object-cover object-center"
+                  loading="eager"
+                  decoding="async"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#02050b]/85 via-transparent to-transparent" />
+                <div className="absolute inset-x-4 bottom-4 rounded-lg border border-accent-cyan/25 bg-black/45 p-3 backdrop-blur-sm">
+                  <p className="terminal-label">Recent Identity Capture</p>
+                  <p className="mt-1 font-mono text-[11px] uppercase tracking-[0.16em] text-slate-100">Interface Engineer | Systems Thinker</p>
+                </div>
+              </div>
+            </Card>
+
+            <Card>
+              <p className="text-sm leading-7 text-slate-200 sm:text-base">
+                My approach combines systems thinking with practical engineering. I focus on accessibility,
+                predictable interaction patterns, and measurable product outcomes. I collaborate closely with
+                product, design, and risk teams to move from discovery to production without losing intent.
+              </p>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-accent-cyan/20 bg-black/30 p-4">
+                  <p className="terminal-label">Current Focus</p>
+                  <p className="mt-2 text-sm text-slate-100">Frontend engineering, UX systems, and high-trust digital product experiences.</p>
+                </div>
+                <div className="rounded-xl border border-accent-cyan/20 bg-black/30 p-4">
+                  <p className="terminal-label">Operating Style</p>
+                  <p className="mt-2 text-sm text-slate-100">Fast iteration, clean architecture, and strong interaction quality under real constraints.</p>
+                </div>
+              </div>
+            </Card>
+          </div>
         </Section>
+
+        <SystemTimeline
+          reducedMotion={reducedMotion}
+          engineeringMode={engineeringMode}
+          viewed={viewedSections.includes('timeline')}
+        />
 
         <Section
           id="skills"
