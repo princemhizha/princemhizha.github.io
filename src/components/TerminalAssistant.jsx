@@ -1,0 +1,99 @@
+import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+
+const aiPersonality = [
+  'Welcome to the PKM AI OS Terminal.',
+  'Type a command. I am always listening.',
+  'System context loaded. Awaiting input.',
+]
+
+const systemCommands = {
+  'explain projects': 'Analyzing portfolio projects...\nPfuma Pamwe: Fintech credit empowerment and AI fraud intelligence.\nHackathon Achievement: Top 5 MVP.\nMedilink Experience: HealthTech system design.\nSmart Panic Bracelet: IoT-based safety concept.',
+  'open architecture': 'Opening architecture schematic...\n[Engineering schematic overlay activated.]',
+  'analyze portfolio': 'Running deep analysis...\nAll systems optimal. UI/UX, AI, and GPU layers operational.',
+  'activate engineering mode': 'Engineering mode engaged. Advanced diagnostics and controls enabled.',
+  'activate focus mode': 'Focus mode engaged. Distractions minimized.',
+  'show telemetry': 'Displaying real-time system telemetry.',
+  'help': 'Available commands: explain projects, open architecture, analyze portfolio, activate engineering mode, activate focus mode, show telemetry, help',
+}
+
+function parseCommand(input, setSystemState) {
+  const cmd = input.trim().toLowerCase()
+  if (cmd in systemCommands) {
+    if (cmd === 'activate engineering mode') setSystemState('engineering')
+    if (cmd === 'activate focus mode') setSystemState('focus')
+    return systemCommands[cmd]
+  }
+  if (cmd.startsWith('go to ')) {
+    const section = cmd.replace('go to ', '').trim()
+    return `Navigating to section: ${section}`
+  }
+  if (cmd.startsWith('explain ')) {
+    return `Explaining: ${cmd.replace('explain ', '')}... [AI OS response simulated]`
+  }
+  return `Unknown command: ${input}`
+}
+
+export default function TerminalAssistant({ visible = true, onNavigate, onSetMode }) {
+  const [open, setOpen] = useState(visible)
+  const [history, setHistory] = useState([aiPersonality[0]])
+  const [input, setInput] = useState('')
+  const [systemState, setSystemState] = useState('normal')
+  const inputRef = useRef(null)
+
+  useEffect(() => {
+    if (open && inputRef.current) inputRef.current.focus()
+  }, [open])
+
+  const handleCommand = (e) => {
+    e.preventDefault()
+    if (!input.trim()) return
+    const response = parseCommand(input, (mode) => {
+      setSystemState(mode)
+      if (onSetMode) onSetMode(mode)
+    })
+    setHistory((h) => [...h, `> ${input}`, response])
+    setInput('')
+    if (response.startsWith('Navigating to section:') && onNavigate) {
+      const section = input.replace(/go to /i, '').trim()
+      onNavigate(section)
+    }
+  }
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed bottom-6 right-6 z-[120] w-[420px] max-w-[98vw] rounded-xl border border-accent-cyan/40 bg-black/90 shadow-neon backdrop-blur-lg"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 40 }}
+          transition={{ duration: 0.28 }}
+        >
+          <div className="p-4 font-mono text-xs text-accent-cyan/90">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="font-bold tracking-widest">AI OS TERMINAL</span>
+              <button className="text-accent-cyan/70 hover:text-accent-cyan" onClick={() => setOpen(false)} aria-label="Close terminal">✕</button>
+            </div>
+            <div className="h-40 overflow-y-auto whitespace-pre-line rounded bg-black/60 p-2 text-accent-cyan/80" style={{ fontFamily: 'inherit' }}>
+              {history.map((line, i) => (
+                <div key={i}>{line}</div>
+              ))}
+            </div>
+            <form className="mt-2 flex" onSubmit={handleCommand} autoComplete="off">
+              <span className="mr-2 text-accent-cyan/60">{systemState === 'engineering' ? 'ENG>' : systemState === 'focus' ? 'FOC>' : 'AI>'}</span>
+              <input
+                ref={inputRef}
+                className="flex-1 rounded bg-black/70 px-2 py-1 text-accent-cyan outline-none placeholder:text-accent-cyan/40"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="Type a command..."
+                spellCheck={false}
+              />
+            </form>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}

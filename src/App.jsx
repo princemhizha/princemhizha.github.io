@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { motion, useMotionValueEvent, useReducedMotion, useScroll, useTransform } from 'framer-motion'
 import { BriefcaseBusiness, Code2, Globe, Mail } from 'lucide-react'
 import Button from './components/ui/Button'
 import Card from './components/ui/Card'
@@ -10,6 +10,23 @@ import Tag from './components/ui/Tag'
 import BinaryStream from './components/BinaryStream'
 import DigitalFog from './components/DigitalFog'
 import CustomCursor from './components/CustomCursor'
+import ShaderField from './components/ShaderField'
+import NeuralNetworkLayer from './components/NeuralNetworkLayer'
+import DataStreamLayer from './components/DataStreamLayer'
+import AmbientLightingEngine from './components/AmbientLightingEngine'
+import TacticalGridOverlay from './components/TacticalGridOverlay'
+import TelemetryHud from './components/TelemetryHud'
+import AIAssistantOrb from './components/AIAssistantOrb'
+import CommandPalette from './components/CommandPalette'
+import SystemTimeline from './components/SystemTimeline'
+import ArchitectureSchematic from './components/ArchitectureSchematic'
+import ParticleIntelligenceLayer from './components/ParticleIntelligenceLayer'
+import TerminalAssistant from './components/TerminalAssistant'
+import GpuFieldLayer from './components/GpuFieldLayer'
+import WorkerFieldLayer from './components/WorkerFieldLayer'
+import NeuralInteractionGraph from './components/NeuralInteractionGraph'
+import RuntimeSelfVisualizer from './components/RuntimeSelfVisualizer'
+import { deriveAdaptiveSignature, loadSignalWasm } from './utils/wasmSignals'
 
 const skills = [
   {
@@ -101,6 +118,7 @@ const projects = [
 
 const navItems = [
   { id: 'about', label: 'About' },
+  { id: 'timeline', label: 'Timeline' },
   { id: 'skills', label: 'Skills' },
   { id: 'projects', label: 'Projects' },
   { id: 'contact', label: 'Contact' },
@@ -128,12 +146,119 @@ function AnimatedTagline({ reducedMotion }) {
   )
 }
 
+function AnimatedIdentityLock({ reducedMotion }) {
+  const chars = 'Prince Kudzai Mhizha'.split('')
+
+  return (
+    <motion.h1
+      className="mt-8 font-display text-5xl font-bold leading-[1.05] tracking-tight text-white sm:text-6xl lg:text-7xl"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.35 }}
+    >
+      {chars.map((char, index) => (
+        <motion.span
+          key={`${char}-${index}`}
+          className="inline-block bg-gradient-to-r from-accent-cyan via-accent-teal to-accent-cyan bg-clip-text text-transparent"
+          initial={{ opacity: 0, y: reducedMotion ? 0 : 8, filter: 'blur(4px)' }}
+          animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+          transition={{ duration: 0.25, delay: 0.06 + index * 0.02 }}
+        >
+          {char === ' ' ? '\u00A0' : char}
+        </motion.span>
+      ))}
+    </motion.h1>
+  )
+}
+
 function App() {
   const reducedMotion = useReducedMotion()
   const [activeSection, setActiveSection] = useState('about')
-  const { scrollY } = useScroll()
+  const [commandOpen, setCommandOpen] = useState(false)
+  const [interactionCount, setInteractionCount] = useState(0)
+  const [idle, setIdle] = useState(false)
+  const [revealPhase, setRevealPhase] = useState(0)
+  const [runtimeMode, setRuntimeMode] = useState('standard')
+  const [scrollVelocity, setScrollVelocity] = useState(0)
+  const [scrollDepth, setScrollDepth] = useState(0)
+  const [prewarmNav, setPrewarmNav] = useState(false)
+  const [engineeringMode, setEngineeringMode] = useState(false)
+  const [focusMode, setFocusMode] = useState(false)
+  const [viewedSections, setViewedSections] = useState([])
+  const [sectionVisitCounts, setSectionVisitCounts] = useState({})
+  const [viewedProjects, setViewedProjects] = useState([])
+  const [projectHoverCounts, setProjectHoverCounts] = useState({})
+  const [hoverBeacon, setHoverBeacon] = useState({ x: 0.5, y: 0.5, intensity: 0, radius: 0.22, id: null })
+  const [transitionPulse, setTransitionPulse] = useState({ id: 'about', tick: 0 })
+  const [interactionTrail, setInteractionTrail] = useState([])
+  const [navigationPattern, setNavigationPattern] = useState(['about'])
+  const [readingFlow, setReadingFlow] = useState(0)
+  const [neuralOverlayMode, setNeuralOverlayMode] = useState(false)
+  const [spatialMode, setSpatialMode] = useState(false)
+  const [runtimeTelemetry, setRuntimeTelemetry] = useState({
+    fps: 0,
+    workerLoad: 0,
+    binaryLoad: 0,
+    packetRate: 0,
+    predictedSections: [],
+    frequencies: [],
+    dynamicTheme: 'standard',
+    sessionAgeMs: 0,
+    particles: 0,
+  })
+  const [hudVisible, setHudVisible] = useState(true)
+  const [wasmRuntime, setWasmRuntime] = useState(null)
+  const [sceneTilt, setSceneTilt] = useState({ x: 0, y: 0 })
+  const activeSectionRef = useRef('about')
+  const focusTimeoutRef = useRef(null)
+  const sectionEnteredAtRef = useRef(performance.now())
+  const pointerRafRef = useRef(null)
+  const pointerPendingRef = useRef({ x: 0.5, y: 0.5, clientY: 0 })
+  const { scrollY, scrollYProgress } = useScroll()
   const heroParallaxY = useTransform(scrollY, [0, 520], [0, -34])
   const heroImageParallaxY = useTransform(scrollY, [0, 520], [0, 20])
+  const distortionY = useTransform(scrollY, [0, 1400], [0, -12])
+
+  const effectProfile = useMemo(() => {
+    if (typeof navigator === 'undefined') {
+      return {
+        tier: 'balanced',
+        networkDensity: 0.8,
+        streamDensity: 0.76,
+        fogDensity: 0.82,
+      }
+    }
+
+    const connection = navigator.connection ?? navigator.mozConnection ?? navigator.webkitConnection
+    const saveData = Boolean(connection?.saveData)
+    const deviceMemory = navigator.deviceMemory ?? 8
+    const cores = navigator.hardwareConcurrency ?? 8
+
+    if (reducedMotion || saveData || deviceMemory <= 4 || cores <= 4) {
+      return {
+        tier: 'low-power',
+        networkDensity: 0.58,
+        streamDensity: 0.52,
+        fogDensity: 0.56,
+      }
+    }
+
+    if (deviceMemory <= 8 || cores <= 8) {
+      return {
+        tier: 'balanced',
+        networkDensity: 0.78,
+        streamDensity: 0.76,
+        fogDensity: 0.8,
+      }
+    }
+
+    return {
+      tier: 'cinematic',
+      networkDensity: 1,
+      streamDensity: 1,
+      fogDensity: 1,
+    }
+  }, [reducedMotion])
 
   const floatTransition = reducedMotion
     ? { duration: 0 }
@@ -162,12 +287,237 @@ function App() {
     show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
   }
 
+  useMotionValueEvent(scrollY, 'change', (current) => {
+    const previous = scrollY.getPrevious() ?? current
+    const delta = current - previous
+    setScrollVelocity(Math.min(22, Math.abs(delta)))
+  })
+
+  useMotionValueEvent(scrollYProgress, 'change', (current) => {
+    setScrollDepth(current)
+  })
+
+  const engagementBoost = useMemo(() => {
+    const interactionSignal = Math.min(1, interactionCount / 28)
+    const scrollSignal = Math.min(1, scrollDepth)
+    const velocitySignal = Math.min(1, scrollVelocity / 20)
+    const modeBoost = runtimeMode === 'deploy' ? 0.2 : 0
+    const idlePenalty = idle ? -0.22 : 0
+    return Math.max(0, Math.min(1, interactionSignal * 0.5 + scrollSignal * 0.35 + velocitySignal * 0.15 + modeBoost + idlePenalty))
+  }, [idle, interactionCount, runtimeMode, scrollDepth, scrollVelocity])
+
+  const throughput = Math.max(0.15, Math.min(0.95, 0.25 + engagementBoost * 0.7))
+  const nodeCount = Math.max(18, Math.round(44 * effectProfile.networkDensity))
+  const memorySignal = useMemo(() => {
+    const viewedSectionBoost = Math.min(1, viewedSections.length / navItems.length)
+    const viewedProjectBoost = Math.min(1, viewedProjects.length / projects.length)
+    return Math.min(1, viewedSectionBoost * 0.45 + viewedProjectBoost * 0.55)
+  }, [viewedProjects, viewedSections])
+
+  const aiAdaptation = useMemo(
+    () =>
+      deriveAdaptiveSignature(wasmRuntime, {
+        engagementBoost,
+        scrollVelocity,
+        focusMode,
+        idle,
+        sectionVisitCounts,
+        viewedProjectsCount: viewedProjects.length,
+        interactionCount,
+      }),
+    [engagementBoost, focusMode, idle, interactionCount, scrollVelocity, sectionVisitCounts, viewedProjects.length, wasmRuntime],
+  )
+
+  const adaptiveNavItems = useMemo(() => {
+    const aboutItem = navItems.find((item) => item.id === 'about')
+    const dynamicItems = navItems
+      .filter((item) => item.id !== 'about')
+      .sort((left, right) => {
+        const leftCount = sectionVisitCounts[left.id] ?? 0
+        const rightCount = sectionVisitCounts[right.id] ?? 0
+
+        if (leftCount === rightCount) {
+          return navItems.findIndex((item) => item.id === left.id) - navItems.findIndex((item) => item.id === right.id)
+        }
+
+        return rightCount - leftCount
+      })
+
+    return aboutItem ? [aboutItem, ...dynamicItems] : dynamicItems
+  }, [sectionVisitCounts])
+
+  const dynamicTheme = runtimeMode === 'showcase' ? 'showcase' : runtimeTelemetry.dynamicTheme
+  const displayNeuralOverlay = neuralOverlayMode || engineeringMode
+  const predictedSections = runtimeTelemetry.predictedSections ?? []
+  const frequencies = runtimeTelemetry.frequencies ?? []
+  const liveParticleCount = runtimeTelemetry.particles || nodeCount
+
+  const sceneTransform = useMemo(() => {
+    if (!spatialMode || reducedMotion) {
+      return { transform: 'none' }
+    }
+
+    const rotateX = sceneTilt.y * -5
+    const rotateY = sceneTilt.x * 6
+    return {
+      transform: `perspective(1400px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`,
+      transformStyle: 'preserve-3d',
+      transition: 'transform 220ms ease-out',
+    }
+  }, [reducedMotion, sceneTilt.x, sceneTilt.y, spatialMode])
+
+  const publishTelemetry = useCallback((payload) => {
+    setRuntimeTelemetry((current) => ({ ...current, ...payload }))
+  }, [])
+
+  const prewarmSection = useCallback((sectionId) => {
+    const section = document.getElementById(sectionId)
+    if (!section) return
+    section.getBoundingClientRect()
+    window.dispatchEvent(new CustomEvent('runtime-prefetch', { detail: { sectionId } }))
+  }, [])
+
+  const runCommand = useCallback((command) => {
+    if (command === 'mode-deploy') {
+      setRuntimeMode('deploy')
+      setInteractionCount((value) => value + 2)
+      return
+    }
+
+    if (command === 'mode-theme') {
+      setRuntimeMode((value) => (value === 'spectrum' ? 'standard' : 'spectrum'))
+      setInteractionCount((value) => value + 1)
+      return
+    }
+
+    if (command === 'mode-engineering') {
+      setEngineeringMode((value) => !value)
+      setInteractionCount((value) => value + 2)
+      return
+    }
+
+    if (command === 'mode-focus') {
+      setFocusMode((value) => !value)
+      setInteractionCount((value) => value + 1)
+      return
+    }
+
+    if (command === 'mode-productivity') {
+      setRuntimeMode('productivity')
+      setInteractionCount((value) => value + 1)
+      return
+    }
+
+    if (command === 'mode-showcase') {
+      setRuntimeMode('showcase')
+      setInteractionCount((value) => value + 2)
+      return
+    }
+
+    if (command === 'mode-neural') {
+      setNeuralOverlayMode((value) => !value)
+      setInteractionCount((value) => value + 1)
+      return
+    }
+
+    if (command === 'mode-spatial') {
+      setSpatialMode((value) => !value)
+      setInteractionCount((value) => value + 1)
+      return
+    }
+
+    const section = document.getElementById(command)
+    if (section) {
+      section.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' })
+      setInteractionCount((value) => value + 1)
+    }
+  }, [reducedMotion])
+
+  const markProjectViewed = useCallback((projectTitle) => {
+    setViewedProjects((current) => (current.includes(projectTitle) ? current : [...current, projectTitle]))
+  }, [])
+
+  const registerProjectHover = useCallback((projectTitle, event) => {
+    markProjectViewed(projectTitle)
+    setProjectHoverCounts((current) => ({
+      ...current,
+      [projectTitle]: (current[projectTitle] ?? 0) + 1,
+    }))
+
+    if (!event?.currentTarget) return
+
+    const rect = event.currentTarget.getBoundingClientRect()
+    setHoverBeacon({
+      x: (rect.left + rect.width * 0.5) / window.innerWidth,
+      y: (rect.top + rect.height * 0.5) / window.innerHeight,
+      intensity: 1,
+      radius: 0.26,
+      id: projectTitle,
+    })
+  }, [markProjectViewed])
+
+  useEffect(() => {
+    let cancelled = false
+
+    loadSignalWasm()
+      .then((runtime) => {
+        if (!cancelled) setWasmRuntime(runtime)
+      })
+      .catch(() => {
+        if (!cancelled) setWasmRuntime(null)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    try {
+      const snapshot = window.sessionStorage.getItem('pkm-runtime-memory')
+      if (!snapshot) return
+
+      const parsed = JSON.parse(snapshot)
+      if (Array.isArray(parsed.viewedSections)) setViewedSections(parsed.viewedSections)
+      if (Array.isArray(parsed.viewedProjects)) setViewedProjects(parsed.viewedProjects)
+      if (parsed.sectionVisitCounts && typeof parsed.sectionVisitCounts === 'object') setSectionVisitCounts(parsed.sectionVisitCounts)
+      if (parsed.projectHoverCounts && typeof parsed.projectHoverCounts === 'object') {
+        setProjectHoverCounts(parsed.projectHoverCounts)
+      }
+      if (typeof parsed.engineeringMode === 'boolean') setEngineeringMode(parsed.engineeringMode)
+    } catch {
+      // Ignore invalid session snapshots.
+    }
+  }, [])
+
+  useEffect(() => {
+    try {
+      window.sessionStorage.setItem(
+        'pkm-runtime-memory',
+        JSON.stringify({
+          viewedSections,
+          sectionVisitCounts,
+          viewedProjects,
+          projectHoverCounts,
+          engineeringMode,
+        }),
+      )
+    } catch {
+      // Ignore storage failures.
+    }
+  }, [engineeringMode, projectHoverCounts, sectionVisitCounts, viewedProjects, viewedSections])
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             setActiveSection(entry.target.id)
+            setViewedSections((current) => (current.includes(entry.target.id) ? current : [...current, entry.target.id]))
+            setSectionVisitCounts((current) => ({
+              ...current,
+              [entry.target.id]: (current[entry.target.id] ?? 0) + 1,
+            }))
           }
         })
       },
@@ -185,12 +535,386 @@ function App() {
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    let lastInteractionStamp = 0
+
+    const updateInteraction = () => {
+      const now = performance.now()
+      if (now - lastInteractionStamp > 120) {
+        lastInteractionStamp = now
+        setInteractionCount((value) => value + 1)
+      }
+      setIdle(false)
+    }
+
+    const onMove = (event) => {
+      updateInteraction()
+      const normalizedX = event.clientX / window.innerWidth
+      const normalizedY = event.clientY / window.innerHeight
+      pointerPendingRef.current = { x: normalizedX, y: normalizedY, clientY: event.clientY }
+
+      if (!pointerRafRef.current) {
+        pointerRafRef.current = requestAnimationFrame(() => {
+          pointerRafRef.current = null
+          const { x, y, clientY } = pointerPendingRef.current
+
+          setPrewarmNav(clientY < 120)
+          document.documentElement.style.setProperty('--pointer-x', `${Math.round(x * 100)}%`)
+          document.documentElement.style.setProperty('--pointer-y', `${Math.round(y * 100)}%`)
+          setSceneTilt({
+            x: (x - 0.5) * 2,
+            y: (y - 0.5) * 2,
+          })
+          setInteractionTrail((current) => {
+            const next = [...current, { x, y, t: Date.now() }]
+            return next.slice(-64)
+          })
+          setHoverBeacon((current) => ({
+            ...current,
+            x,
+            y,
+            intensity: Math.min(1, current.intensity + 0.08),
+          }))
+        })
+      }
+
+      if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current)
+      setFocusMode(false)
+      focusTimeoutRef.current = setTimeout(() => setFocusMode(true), 1200)
+    }
+
+    window.addEventListener('pointerdown', updateInteraction)
+    window.addEventListener('keydown', updateInteraction)
+    window.addEventListener('mousemove', onMove, { passive: true })
+
+    return () => {
+      window.removeEventListener('pointerdown', updateInteraction)
+      window.removeEventListener('keydown', updateInteraction)
+      window.removeEventListener('mousemove', onMove)
+      if (pointerRafRef.current) cancelAnimationFrame(pointerRafRef.current)
+      if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current)
+    }
+  }, [])
+
+  useEffect(() => {
+    let idleTimeout = null
+
+    const arm = () => {
+      if (idleTimeout) clearTimeout(idleTimeout)
+      idleTimeout = setTimeout(() => setIdle(true), 5200)
+    }
+
+    const onActivity = () => {
+      setIdle(false)
+      arm()
+    }
+
+    arm()
+    window.addEventListener('mousemove', onActivity, { passive: true })
+    window.addEventListener('pointerdown', onActivity)
+    window.addEventListener('keydown', onActivity)
+
+    return () => {
+      if (idleTimeout) clearTimeout(idleTimeout)
+      window.removeEventListener('mousemove', onActivity)
+      window.removeEventListener('pointerdown', onActivity)
+      window.removeEventListener('keydown', onActivity)
+    }
+  }, [])
+
+  useEffect(() => {
+    sectionEnteredAtRef.current = performance.now()
+    setNavigationPattern((current) => [...current.slice(-7), activeSection])
+  }, [activeSection])
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const dwellMs = performance.now() - sectionEnteredAtRef.current
+      const dwellScore = Math.min(1, dwellMs / 16000)
+      const velocityPenalty = Math.min(1, scrollVelocity / 18)
+      const focusBoost = focusMode ? 0.2 : 0
+      setReadingFlow(Math.max(0, Math.min(1, dwellScore * (1 - velocityPenalty) + focusBoost)))
+      setHoverBeacon((current) => ({ ...current, intensity: Math.max(0, current.intensity * 0.94) }))
+    }, 320)
+
+    return () => clearInterval(timer)
+  }, [focusMode, scrollVelocity])
+
+  useEffect(() => {
+    if (!predictedSections.length) return
+    predictedSections.forEach((sectionId) => prewarmSection(sectionId))
+  }, [predictedSections, prewarmSection])
+
+  useEffect(() => {
+    document.body.dataset.runtimeTheme = dynamicTheme
+    document.body.dataset.runtimeMode = runtimeMode
+    return () => {
+      delete document.body.dataset.runtimeTheme
+      delete document.body.dataset.runtimeMode
+    }
+  }, [dynamicTheme, runtimeMode])
+
+  useEffect(() => {
+    const onPaletteShortcut = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setCommandOpen((value) => !value)
+      }
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'e') {
+        event.preventDefault()
+        setEngineeringMode((value) => !value)
+      }
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'f') {
+        event.preventDefault()
+        setFocusMode((value) => !value)
+      }
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'x') {
+        event.preventDefault()
+        setNeuralOverlayMode((value) => !value)
+      }
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'v') {
+        event.preventDefault()
+        setRuntimeMode((value) => (value === 'showcase' ? 'standard' : 'showcase'))
+      }
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'd') {
+        event.preventDefault()
+        setSpatialMode((value) => !value)
+      }
+      if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key.toLowerCase() === 'h') {
+        event.preventDefault()
+        setHudVisible((value) => !value)
+      }
+      if (event.key === 'Escape') {
+        setCommandOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', onPaletteShortcut)
+    return () => window.removeEventListener('keydown', onPaletteShortcut)
+  }, [])
+
+  useEffect(() => {
+    if (reducedMotion) {
+      setRevealPhase(4)
+      return
+    }
+
+    const steps = [
+      setTimeout(() => setRevealPhase(1), 260),
+      setTimeout(() => setRevealPhase(2), 680),
+      setTimeout(() => setRevealPhase(3), 1120),
+      setTimeout(() => setRevealPhase(4), 1600),
+    ]
+
+    return () => steps.forEach(clearTimeout)
+  }, [reducedMotion])
+
+  useEffect(() => {
+    const onCardEnergy = (event) => {
+      if (!event.detail) return
+      setHoverBeacon(event.detail)
+    }
+
+    const onCardEnergyEnd = () => {
+      setHoverBeacon((current) => ({ ...current, intensity: 0 }))
+    }
+
+    window.addEventListener('card-energy', onCardEnergy)
+    window.addEventListener('card-energy-end', onCardEnergyEnd)
+
+    return () => {
+      window.removeEventListener('card-energy', onCardEnergy)
+      window.removeEventListener('card-energy-end', onCardEnergyEnd)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (activeSectionRef.current === activeSection) return
+    activeSectionRef.current = activeSection
+    setTransitionPulse({ id: activeSection, tick: Date.now() })
+  }, [activeSection])
+
+  // For demo: always show terminal, wire up navigation/mode
+  const handleTerminalNavigate = (section) => {
+    const nav = navItems.find((item) => item.id === section)
+    if (nav) {
+      document.getElementById(nav.id)?.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'start' })
+    }
+  }
+  const handleTerminalMode = (mode) => {
+    if (mode === 'engineering') setEngineeringMode(true)
+    if (mode === 'focus') setFocusMode(true)
+  }
+
   return (
-    <div className="relative min-h-screen overflow-x-clip bg-bg text-slate-100">
-      {/* Background layer components */}
-      <BinaryStream />
-      <DigitalFog />
-      <CustomCursor />
+    <div className={`relative min-h-screen overflow-x-clip bg-bg text-slate-100 ${idle ? 'low-power' : ''} ${focusMode ? 'focus-mode' : ''} ${engineeringMode ? 'engineering-mode' : ''} ${runtimeMode === 'showcase' ? 'showcase-mode' : ''} ${spatialMode ? 'spatial-mode' : ''} theme-${dynamicTheme}`}>
+        <TerminalAssistant visible={true} onNavigate={handleTerminalNavigate} onSetMode={handleTerminalMode} />
+      {effectProfile.tier !== 'low-power' && (
+        <WorkerFieldLayer
+          reducedMotion={reducedMotion}
+          quality={effectProfile.tier}
+          interactionBoost={engagementBoost}
+          activeSection={activeSection}
+          runtimeMode={runtimeMode}
+          hoverBeacon={hoverBeacon}
+          onTelemetry={publishTelemetry}
+        />
+      )}
+      <ShaderField reducedMotion={reducedMotion} interactionBoost={engagementBoost} quality={effectProfile.tier} />
+      <GpuFieldLayer
+        reducedMotion={reducedMotion}
+        quality={effectProfile.tier}
+        activeSection={activeSection}
+        interactionBoost={engagementBoost}
+        hoverBeacon={hoverBeacon}
+        scrollVelocity={scrollVelocity}
+        focusMode={focusMode}
+        engineeringMode={engineeringMode}
+        adaptiveScore={aiAdaptation.adaptiveScore}
+        frequencies={frequencies}
+      />
+      <DataStreamLayer reducedMotion={reducedMotion} throughput={throughput} quality={effectProfile.tier} density={effectProfile.streamDensity} />
+      <BinaryStream scrollVelocity={scrollVelocity * aiAdaptation.motionScale} focusMode={focusMode} />
+      <DigitalFog
+        activeSection={activeSection}
+        interactionBoost={engagementBoost}
+        reducedMotion={reducedMotion}
+        quality={effectProfile.tier}
+        density={effectProfile.fogDensity}
+      />
+      <NeuralNetworkLayer
+        reducedMotion={reducedMotion}
+        activeSection={activeSection}
+        interactionBoost={engagementBoost}
+        quality={effectProfile.tier}
+        density={effectProfile.networkDensity}
+        frequencies={frequencies}
+      />
+      <ParticleIntelligenceLayer
+        reducedMotion={reducedMotion}
+        activeSection={activeSection}
+        interactionBoost={engagementBoost}
+        hoverBeacon={hoverBeacon}
+        scrollVelocity={scrollVelocity}
+        focusMode={focusMode}
+        engineeringMode={engineeringMode}
+        quality={effectProfile.tier}
+        frequencies={frequencies}
+      />
+      {displayNeuralOverlay && (
+        <NeuralInteractionGraph
+          reducedMotion={reducedMotion}
+          interactionTrail={interactionTrail}
+          activeSection={activeSection}
+          interactionBoost={engagementBoost}
+          engineeringMode={engineeringMode}
+          hoverBeacon={hoverBeacon}
+          readingFlow={readingFlow}
+          navigationPattern={navigationPattern}
+          frequencies={frequencies}
+        />
+      )}
+      <TacticalGridOverlay />
+      <AmbientLightingEngine
+        activeSection={activeSection}
+        interactionBoost={engagementBoost + memorySignal * 0.12}
+        idle={idle}
+        hoverBeacon={hoverBeacon}
+        focusMode={focusMode}
+        engineeringMode={engineeringMode}
+        adaptation={aiAdaptation}
+      />
+      {effectProfile.tier !== 'low-power' && <CustomCursor />}
+      {effectProfile.tier !== 'low-power' && (
+        <ArchitectureSchematic
+          engineeringMode={engineeringMode}
+          focusMode={focusMode}
+          viewedSections={viewedSections}
+          throughput={throughput}
+          predictedSections={predictedSections}
+          workerLoad={runtimeTelemetry.workerLoad}
+          packetRate={runtimeTelemetry.packetRate}
+          dynamicTheme={dynamicTheme}
+        />
+      )}
+      {hudVisible && (
+        <TelemetryHud
+          activeSection={activeSection}
+          interactionCount={interactionCount}
+          nodeCount={nodeCount}
+          throughput={throughput}
+          idle={idle}
+          quality={effectProfile.tier}
+          engineeringMode={engineeringMode}
+          focusMode={focusMode}
+          viewedProjects={viewedProjects.length}
+          aiMode={aiAdaptation.layoutMode}
+          wasmReady={aiAdaptation.wasmReady}
+          workerLoad={runtimeTelemetry.workerLoad}
+          dynamicTheme={dynamicTheme}
+          packetRate={runtimeTelemetry.packetRate}
+          predictedSections={predictedSections}
+          particles={liveParticleCount}
+          binaryLoad={runtimeTelemetry.binaryLoad}
+          onClose={() => setHudVisible(false)}
+        />
+      )}
+      <RuntimeSelfVisualizer
+        visible={displayNeuralOverlay}
+        activeSection={activeSection}
+        dynamicTheme={dynamicTheme}
+        predictedSections={predictedSections}
+        packetRate={runtimeTelemetry.packetRate}
+        workerLoad={runtimeTelemetry.workerLoad}
+        frequencies={frequencies}
+        sessionAgeMs={runtimeTelemetry.sessionAgeMs}
+      />
+      <AIAssistantOrb
+        onOpenCommand={() => setCommandOpen(true)}
+        interactionBoost={engagementBoost}
+        engineeringMode={engineeringMode}
+        focusMode={focusMode}
+      />
+      <CommandPalette
+        open={commandOpen}
+        onClose={() => setCommandOpen(false)}
+        onRun={runCommand}
+        sectionPriority={aiAdaptation.sectionPriority}
+        layoutMode={aiAdaptation.layoutMode}
+      />
+
+      {transitionPulse.tick > 0 && !reducedMotion && (
+        <motion.div
+          key={transitionPulse.tick}
+          className="pointer-events-none fixed inset-0 z-[40]"
+          initial={{ opacity: 0.22, scale: 0.985 }}
+          animate={{ opacity: 0, scale: 1.02 }}
+          transition={{ duration: 0.7, ease: 'easeOut' }}
+          aria-hidden="true"
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,229,255,0.09),transparent_55%)]" />
+        </motion.div>
+      )}
+
+      {revealPhase < 4 && (
+        <motion.div
+          className="fixed inset-0 z-[95] flex items-center justify-center bg-[#030507]/95 backdrop-blur-sm"
+          initial={{ opacity: 1 }}
+          animate={{ opacity: revealPhase >= 3 ? 0 : 1 }}
+          transition={{ duration: 0.5 }}
+          aria-hidden="true"
+        >
+          <div className="text-center font-mono">
+            <p className="terminal-label">BOOTSTRAP SEQUENCE</p>
+            <p className="mt-2 text-sm text-accent-cyan/90">
+              {revealPhase === 0 && 'Stabilizing shader environment...'}
+              {revealPhase === 1 && 'Forming UI shell...'}
+              {revealPhase === 2 && 'Routing neural signal mesh...'}
+              {revealPhase >= 3 && 'Finalizing atmospheric locks...'}
+            </p>
+          </div>
+        </motion.div>
+      )}
 
       {/* Atmospheric mesh overlay */}
       <div aria-hidden="true" className="mesh-overlay pointer-events-none fixed inset-0 opacity-40" />
@@ -215,17 +939,19 @@ function App() {
         transition={{ ...floatTransition, duration: 26 }}
       />
 
-      <nav className="sticky top-4 z-50 px-4">
+      <div style={sceneTransform}>
+      <nav className={`sticky top-4 z-50 px-4 transition duration-500 ${prewarmNav ? 'scale-[1.01]' : ''}`}>
         <Container className="max-w-5xl px-0">
           <div className="mx-auto flex w-full items-center justify-between rounded-xl border border-accent-cyan/30 bg-black/40 px-4 py-3 shadow-neon backdrop-blur-2xl sm:px-6">
             <a href="#" className="font-display text-sm font-bold tracking-widest uppercase text-accent-cyan">
               PKM
             </a>
             <ul className="flex items-center gap-1 rounded-lg border border-accent-cyan/20 bg-black/30 p-1.5">
-              {navItems.map((item) => (
+              {adaptiveNavItems.map((item) => (
                 <li key={item.id} className="list-none">
                   <a
                     href={`#${item.id}`}
+                    onMouseEnter={() => prewarmSection(item.id)}
                     className={`nav-link-underline relative inline-flex rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-cyan sm:text-sm ${
                       activeSection === item.id ? 'text-accent-cyan' : 'text-slate-300 hover:text-accent-cyan'
                     }`}
@@ -253,6 +979,7 @@ function App() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
             className="cyber-card relative overflow-hidden border-accent-cyan/40 p-8 sm:p-12"
+            style={{ y: reducedMotion ? 0 : distortionY }}
           >
             {/* Cyberpunk gradient overlay */}
             <div
@@ -280,14 +1007,9 @@ function App() {
                   UI/UX Engineer | Developer
                 </motion.span>
 
-                <motion.h1
-                  variants={heroItemVariants}
-                  className="mt-8 font-display text-5xl sm:text-6xl lg:text-7xl font-bold leading-[1.05] tracking-tight text-white"
-                >
-                  <span className="bg-gradient-to-r from-accent-cyan via-accent-teal to-accent-cyan bg-clip-text text-transparent">
-                    Prince Kudzai Mhizha
-                  </span>
-                </motion.h1>
+                <motion.div variants={heroItemVariants}>
+                  <AnimatedIdentityLock reducedMotion={reducedMotion} />
+                </motion.div>
 
                 <motion.p variants={heroItemVariants} className="mt-5 text-sm font-semibold text-accent-cyan/80 font-mono">
                   Computer Science | Zimbabwe
@@ -348,6 +1070,8 @@ function App() {
             </p>
           </Card>
         </Section>
+
+        <SystemTimeline reducedMotion={reducedMotion} engineeringMode={engineeringMode} viewed={viewedSections.includes('timeline')} />
 
         <Section
           id="skills"
@@ -414,11 +1138,18 @@ function App() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ duration: 0.38, delay: index * 0.1 }}
+                onViewportEnter={() => markProjectViewed(project.title)}
+                onMouseEnter={(event) => registerProjectHover(project.title, event)}
               >
-                <Card className="h-full">
+                <Card className={`h-full ${viewedProjects.includes(project.title) ? 'memory-trace' : ''}`} dataCardId={project.title}>
                   <h3 className="font-display text-xl font-semibold text-white">{project.title}</h3>
                   <p className="mt-2 text-sm text-slate-200">{project.summary}</p>
                   <p className="mt-2 text-sm text-slate-300">{project.scope}</p>
+                  {viewedProjects.includes(project.title) && (
+                    <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-accent-cyan/60">
+                      Session memory retained
+                    </p>
+                  )}
                   <ul className="mt-4 space-y-2 text-sm text-slate-200">
                     {project.bullets.map((bullet) => (
                       <li key={bullet} className="flex gap-3">
@@ -512,6 +1243,7 @@ function App() {
           </Card>
         </Section>
       </main>
+      </div>
     </div>
   )
 }

@@ -1,9 +1,7 @@
 import { useEffect, useRef } from 'react';
-import { useMotionValueEvent, useScroll } from 'framer-motion';
 
-export default function BinaryStream() {
+export default function BinaryStream({ scrollVelocity = 0, focusMode = false }) {
   const canvasRef = useRef(null);
-  const { scrollY } = useScroll();
   const animationRef = useRef(null);
   const binaryColumnsRef = useRef([]);
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -33,6 +31,7 @@ export default function BinaryStream() {
       x: Math.random() * width,
       y: Math.random() * height * 2 - height,
       speed: 0.5 + Math.random() * 1.5,
+      drift: (Math.random() - 0.5) * 0.32,
       chars: Array.from({ length: 20 }, () => (Math.random() > 0.5 ? '0' : '1')),
       opacity: Math.random() * 0.3 + 0.1,
       offset: Math.random() * 50,
@@ -52,6 +51,7 @@ export default function BinaryStream() {
       columns.forEach((col, idx) => {
         // Update position
         col.y += col.speed;
+        col.x += col.drift + scrollVelocity * 0.02 * (idx % 2 === 0 ? 1 : -1);
         if (col.y > height + 100) {
           col.y = -100;
           col.chars = Array.from({ length: 20 }, () => (Math.random() > 0.5 ? '0' : '1'));
@@ -61,7 +61,7 @@ export default function BinaryStream() {
 
         // Soft flicker
         const flicker = Math.sin(frameCount * 0.1 + idx) * 0.15;
-        const alpha = Math.max(0.05, col.opacity + flicker);
+        const alpha = Math.max(0.05, col.opacity + flicker + (focusMode ? 0.06 : 0));
 
         // Draw binary characters
         ctx.font = '14px "JetBrains Mono"';
@@ -104,7 +104,7 @@ export default function BinaryStream() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [prefersReducedMotion]);
+  }, [focusMode, prefersReducedMotion, scrollVelocity]);
 
   return (
     <canvas
