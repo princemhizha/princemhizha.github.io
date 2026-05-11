@@ -565,19 +565,157 @@
           }
           @keyframes pkm-v3-gb { from{opacity:.55;transform:scale(1)} to{opacity:1;transform:scale(1.06)} }
 
+          /* ── FUTURISTIC ROLE + STATUS MODULE (SECTION-ONLY UPGRADE) ─────── */
+          .pkm-v4-hero-module {
+            position: relative;
+            isolation: isolate;
+            padding: 1.05rem 1.1rem 0.9rem;
+            margin-bottom: 0.6rem;
+            border: 1px solid rgba(6,182,212,.22);
+            border-radius: 16px;
+            background:
+              linear-gradient(135deg, rgba(6,182,212,.08), rgba(10,16,28,.55) 45%, rgba(139,92,246,.08));
+            box-shadow:
+              inset 0 1px 0 rgba(255,255,255,.05),
+              0 16px 40px rgba(0,0,0,.35),
+              0 0 34px rgba(6,182,212,.14);
+            backdrop-filter: blur(14px) saturate(1.2);
+            overflow: hidden;
+          }
+          .pkm-v4-hero-module::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            pointer-events: none;
+            border-radius: 18px;
+            background: linear-gradient(110deg, rgba(6,182,212,.22), transparent 34%, rgba(167,139,250,.2) 66%, transparent);
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            padding: 1px;
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            opacity: .82;
+          }
+          .pkm-v4-hero-module::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(120deg, transparent 26%, rgba(255,255,255,.09) 49%, transparent 72%);
+            transform: translateX(-130%);
+            animation: pkm-v4-sweep 6.2s linear infinite;
+            opacity: .45;
+          }
+          @keyframes pkm-v4-sweep { to { transform: translateX(130%); } }
+
+          .pkm-v4-role-row {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 0.72rem;
+            margin-bottom: 0.78rem;
+            z-index: 2;
+          }
+
+          .pkm-v4-core {
+            position: relative;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid rgba(6,182,212,.44);
+            background: radial-gradient(circle at 35% 35%, rgba(103,232,249,.35), rgba(6,182,212,.08) 52%, rgba(2,8,22,.85));
+            box-shadow: 0 0 20px rgba(6,182,212,.3), inset 0 0 15px rgba(6,182,212,.24);
+            flex-shrink: 0;
+          }
+          .pkm-v4-core::before,
+          .pkm-v4-core::after {
+            content: '';
+            position: absolute;
+            inset: -7px;
+            border-radius: 50%;
+            border: 1px solid rgba(6,182,212,.28);
+          }
+          .pkm-v4-core::before { animation: pkm-v4-core-spin 8s linear infinite; }
+          .pkm-v4-core::after {
+            inset: -12px;
+            border-color: rgba(167,139,250,.22);
+            animation: pkm-v4-core-spin-rev 11s linear infinite;
+          }
+          .pkm-v4-core-dot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 8px;
+            height: 8px;
+            margin-left: -4px;
+            margin-top: -4px;
+            border-radius: 50%;
+            background: #67e8f9;
+            box-shadow: 0 0 14px rgba(103,232,249,.85);
+            animation: pkm-v4-core-pulse 1.8s ease-in-out infinite;
+          }
+          @keyframes pkm-v4-core-spin { to { transform: rotate(360deg); } }
+          @keyframes pkm-v4-core-spin-rev { to { transform: rotate(-360deg); } }
+          @keyframes pkm-v4-core-pulse {
+            0%,100% { transform: scale(1); opacity: .95; }
+            50% { transform: scale(1.26); opacity: .62; }
+          }
+
+          .pkm-v4-role {
+            position: relative;
+            display: inline-flex !important;
+            align-items: center;
+            min-height: 2.05rem;
+            padding: .44rem .95rem !important;
+            border-radius: 999px !important;
+            border: 1px solid rgba(34,211,238,.54) !important;
+            background: linear-gradient(120deg, rgba(6,182,212,.13), rgba(2,8,22,.58));
+            color: #22d3ee !important;
+            letter-spacing: .28em !important;
+            text-transform: uppercase;
+            font-weight: 700 !important;
+            font-size: clamp(.54rem, 1.12vw, .84rem) !important;
+            text-shadow: 0 0 12px rgba(6,182,212,.45);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,.08), 0 0 26px rgba(6,182,212,.18);
+            white-space: nowrap;
+            overflow: hidden;
+            max-width: min(100%, 1000px);
+            animation: pkm-v4-role-in .8s cubic-bezier(.22,1,.36,1) both;
+          }
+          .pkm-v4-role::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            background: linear-gradient(95deg, transparent 20%, rgba(255,255,255,.16) 48%, transparent 76%);
+            transform: translateX(-140%);
+            animation: pkm-v4-role-sweep 4.8s linear infinite;
+          }
+          @keyframes pkm-v4-role-sweep { to { transform: translateX(140%); } }
+          @keyframes pkm-v4-role-in {
+            from { opacity: 0; transform: translateY(12px); filter: blur(3px); }
+            to { opacity: 1; transform: none; filter: none; }
+          }
+
           /* ── IDENTITY STATUS ROW ─────────────────────────────────────────── */
           .pkm-v3-srow {
-            display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+            display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
             margin-bottom: 18px; position: relative; z-index: 2;
             max-width: 100%;
           }
           .pkm-v3-badge {
             display: inline-flex; align-items: center; gap: 5px;
-            padding: 4px 11px; border-radius: 100px;
+            padding: 6px 13px; border-radius: 100px;
             font-family: ui-monospace, Menlo, monospace;
             font-size: 8px; letter-spacing: .15em; text-transform: uppercase;
-            white-space: nowrap; transition: box-shadow .3s;
+            white-space: nowrap;
+            transition: box-shadow .3s, transform .3s, border-color .3s, background .3s;
             flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(7px);
+            will-change: transform;
           }
           .pkm-v3-badge.bc {
             background: rgba(6,182,212,.07);
@@ -594,7 +732,20 @@
             border: 1px solid rgba(139,92,246,.24);
             color: rgba(167,139,250,.9);
           }
-          .pkm-v3-badge:hover { box-shadow: 0 0 14px rgba(6,182,212,.15); }
+          .pkm-v3-badge::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(105deg, transparent 22%, rgba(255,255,255,.18) 49%, transparent 76%);
+            transform: translateX(-130%);
+            transition: transform .45s ease;
+          }
+          .pkm-v3-badge:hover {
+            box-shadow: 0 10px 20px rgba(6,182,212,.2);
+            transform: translateY(-2px);
+          }
+          .pkm-v3-badge:hover::after { transform: translateX(130%); }
           .pkm-v3-dot {
             width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0;
           }
@@ -624,6 +775,51 @@
             background: linear-gradient(to bottom, transparent, rgba(6,182,212,.3), transparent);
           }
           .pkm-v3-ditem .pkm-v3-dot { width: 4px; height: 4px; }
+
+          @media (max-width: 640px) {
+            .pkm-v4-hero-module {
+              padding: .78rem .72rem .72rem;
+              border-radius: 14px;
+              margin-left: -2px;
+              margin-right: -2px;
+            }
+            .pkm-v4-role-row {
+              gap: .56rem;
+              margin-bottom: .66rem;
+            }
+            .pkm-v4-core {
+              width: 28px;
+              height: 28px;
+            }
+            .pkm-v4-role {
+              letter-spacing: .14em !important;
+              font-size: .6rem !important;
+              padding: .4rem .72rem !important;
+              min-height: 1.8rem;
+              max-width: calc(100vw - 68px);
+            }
+            .pkm-v3-srow {
+              gap: 6px;
+            }
+            .pkm-v3-badge {
+              font-size: 7px;
+              padding: 5px 10px;
+              letter-spacing: .11em;
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            .pkm-v4-hero-module::after,
+            .pkm-v4-role::after,
+            .pkm-v4-core::before,
+            .pkm-v4-core::after,
+            .pkm-v4-core-dot,
+            .pkm-v3-dot,
+            .pkm-v3-badge::after {
+              animation: none !important;
+              transition: none !important;
+            }
+          }
 
           /* ── ANIMATED HERO SECTION BORDER ───────────────────────────────── */
           .pkm-v3-hborder {
@@ -870,6 +1066,36 @@
           if (!par) return
           par.style.position = 'relative'
 
+          const moduleWrap = par.parentElement
+          if (moduleWrap) {
+            moduleWrap.classList.add('pkm-v4-hero-module')
+            moduleWrap.style.transform = 'none'
+            moduleWrap.style.opacity = '1'
+          }
+
+          const roleTag = moduleWrap && moduleWrap.querySelector('span.inline-flex.items-center.rounded-full')
+          if (roleTag) {
+            roleTag.classList.add('pkm-v4-role')
+            roleTag.textContent = 'UI/UX ENGINEER | DEVELOPER'
+            roleTag.style.transform = 'none'
+            roleTag.style.opacity = '1'
+
+            if (!moduleWrap.querySelector('.pkm-v4-role-row')) {
+              const row = document.createElement('div')
+              row.className = 'pkm-v4-role-row'
+
+              const core = document.createElement('div')
+              core.className = 'pkm-v4-core'
+              const coreDot = document.createElement('div')
+              coreDot.className = 'pkm-v4-core-dot'
+              core.appendChild(coreDot)
+
+              moduleWrap.insertBefore(row, roleTag)
+              row.appendChild(core)
+              row.appendChild(roleTag)
+            }
+          }
+
           /* 2 · Ambient radial glow behind name */
           if (!par.querySelector('.pkm-v3-nglow')) {
             const gl = document.createElement('div')
@@ -938,6 +1164,613 @@
           if (!heroPatched) patchHero()
           upgradeHud()
         }).observe(document.body, { childList: true, subtree: true })
+      })()
+    </script>
+
+    <script>
+      (() => {
+        if (window.__pkmUltraTelemetry) return
+        window.__pkmUltraTelemetry = true
+
+        const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+        const css = `
+          #pkm-net-hud {
+            --pkm-cyan: #22d3ee;
+            --pkm-teal: #14b8a6;
+            --pkm-violet: #8b5cf6;
+            --pkm-bg: rgba(2, 10, 24, 0.74);
+            --pkm-bg-strong: rgba(3, 12, 28, 0.92);
+            --pkm-border: rgba(34, 211, 238, 0.28);
+            --pkm-glow: 0 0 34px rgba(34, 211, 238, 0.22);
+            position: fixed;
+            top: 72px;
+            right: 14px;
+            z-index: 130;
+            width: min(356px, calc(100vw - 28px));
+            color: #d7f8ff;
+            border-radius: 16px;
+            border: 1px solid var(--pkm-border);
+            background:
+              linear-gradient(138deg, rgba(34, 211, 238, 0.1), rgba(2, 10, 24, 0.86) 42%, rgba(139, 92, 246, 0.14)),
+              var(--pkm-bg);
+            box-shadow:
+              var(--pkm-glow),
+              0 20px 45px rgba(0, 0, 0, 0.45),
+              inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(18px) saturate(1.26);
+            overflow: hidden;
+            isolation: isolate;
+            transform: translateZ(0);
+            transition: box-shadow .35s ease, border-color .35s ease, transform .35s ease;
+            font-family: 'JetBrains Mono', 'Chakra Petch', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-variant-numeric: tabular-nums;
+          }
+          #pkm-net-hud.pkm-net-hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transform: translateY(-6px) scale(.985);
+            box-shadow: none;
+          }
+          #pkm-net-hud::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: linear-gradient(102deg, transparent 24%, rgba(255, 255, 255, 0.12) 48%, transparent 72%);
+            transform: translateX(-130%);
+            animation: pkm-hud-sweep 7.2s linear infinite;
+            opacity: .5;
+          }
+          #pkm-net-hud::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background: repeating-linear-gradient(
+              0deg,
+              transparent,
+              transparent 4px,
+              rgba(0, 0, 0, 0.07) 4px,
+              rgba(0, 0, 0, 0.07) 5px
+            );
+            opacity: .25;
+            mix-blend-mode: screen;
+          }
+          #pkm-net-hud:hover {
+            border-color: rgba(34, 211, 238, 0.48);
+            box-shadow:
+              0 0 46px rgba(34, 211, 238, 0.28),
+              0 22px 58px rgba(0, 0, 0, 0.52),
+              inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            transform: translateY(-1px);
+          }
+          @keyframes pkm-hud-sweep { to { transform: translateX(130%); } }
+
+          .pkm-net-head {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px 8px;
+            border-bottom: 1px solid rgba(34, 211, 238, 0.16);
+            background: linear-gradient(180deg, rgba(34, 211, 238, 0.12), transparent);
+          }
+          .pkm-net-head .label {
+            font-size: 10px;
+            letter-spacing: .18em;
+            color: rgba(161, 242, 255, 0.92);
+            text-transform: uppercase;
+            font-weight: 700;
+          }
+          .pkm-node-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 9px;
+            color: rgba(189, 248, 255, 0.94);
+            letter-spacing: .14em;
+            text-transform: uppercase;
+          }
+          .pkm-node-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #22d3ee;
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.9);
+            animation: pkm-node-pulse 1.8s ease-in-out infinite;
+          }
+          @keyframes pkm-node-pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .55; transform: scale(1.35); }
+          }
+
+          .pkm-net-grid {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            padding: 10px 12px 6px;
+          }
+          .pkm-metric {
+            border: 1px solid rgba(34, 211, 238, 0.16);
+            border-radius: 12px;
+            padding: 8px 9px;
+            background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(34, 211, 238, 0.06));
+            min-height: 58px;
+          }
+          .pkm-metric .k {
+            display: block;
+            font-size: 8px;
+            letter-spacing: .14em;
+            color: rgba(160, 191, 208, 0.92);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+          }
+          .pkm-metric .v {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 5px;
+            color: #baf4ff;
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1;
+            transition: text-shadow .25s ease, transform .25s ease;
+          }
+          .pkm-metric .v.live {
+            text-shadow: 0 0 14px rgba(34, 211, 238, 0.6);
+            transform: translateY(-1px);
+          }
+          .pkm-metric .u {
+            font-size: 10px;
+            color: rgba(167, 217, 235, 0.86);
+          }
+
+          .pkm-net-viz-wrap {
+            position: relative;
+            z-index: 2;
+            margin: 2px 12px 8px;
+            border: 1px solid rgba(34, 211, 238, 0.14);
+            border-radius: 10px;
+            overflow: hidden;
+            background: radial-gradient(circle at 20% 20%, rgba(34, 211, 238, 0.1), rgba(2, 10, 24, 0.8));
+          }
+          #pkm-net-canvas {
+            display: block;
+            width: 100%;
+            height: 88px;
+          }
+
+          .pkm-feed {
+            position: relative;
+            z-index: 2;
+            margin: 0 12px 8px;
+            border: 1px solid rgba(34, 211, 238, 0.14);
+            border-radius: 10px;
+            background: rgba(3, 15, 32, 0.6);
+            overflow: hidden;
+          }
+          .pkm-feed-head {
+            padding: 7px 9px;
+            border-bottom: 1px solid rgba(34, 211, 238, 0.13);
+            font-size: 8px;
+            letter-spacing: .16em;
+            text-transform: uppercase;
+            color: rgba(167, 217, 235, 0.9);
+          }
+          #pkm-feed-list {
+            max-height: 98px;
+            overflow: hidden;
+            padding: 5px 9px 7px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+          }
+          .pkm-feed-item {
+            font-size: 9px;
+            letter-spacing: .08em;
+            color: rgba(190, 240, 252, 0.92);
+            transform: translateY(7px);
+            opacity: 0;
+            animation: pkm-feed-in .32s ease forwards;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+          }
+          .pkm-feed-item.dim { opacity: .38; }
+          @keyframes pkm-feed-in {
+            to { transform: translateY(0); opacity: .95; }
+          }
+
+          .pkm-diag {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin: 0 12px 10px;
+            padding: 7px 8px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 10px;
+            background: linear-gradient(130deg, rgba(18, 12, 36, 0.5), rgba(3, 16, 34, 0.62));
+            opacity: .78;
+            transition: opacity .3s ease;
+          }
+          #pkm-net-hud:hover .pkm-diag { opacity: 1; }
+          .pkm-diag p {
+            margin: 0;
+            font-size: 8px;
+            letter-spacing: .1em;
+            color: rgba(196, 226, 240, 0.92);
+            text-transform: uppercase;
+          }
+          .pkm-diag .vv {
+            color: #d4f7ff;
+            font-weight: 700;
+          }
+
+          .pkm-net-scan {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 44px;
+            height: 1px;
+            pointer-events: none;
+            background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.82), transparent);
+            animation: pkm-net-scan 2.7s ease-in-out infinite;
+            z-index: 3;
+          }
+          @keyframes pkm-net-scan {
+            0%, 100% { transform: translateY(0); opacity: .22; }
+            50% { transform: translateY(288px); opacity: .62; }
+          }
+
+          body.pkm-telemetry-spike .pkm-v3-cg {
+            transform: translate(-50%, -50%) scale(1.1);
+            filter: saturate(1.18);
+          }
+          body.pkm-telemetry-spike .pkm-v3-sl {
+            opacity: .86;
+          }
+
+          @media (max-width: 960px) {
+            #pkm-net-hud {
+              width: min(330px, calc(100vw - 20px));
+              top: 62px;
+              right: 10px;
+            }
+            .pkm-diag { grid-template-columns: 1fr; }
+          }
+
+          @media (max-width: 640px) {
+            #pkm-net-hud {
+              width: calc(100vw - 12px);
+              top: 56px;
+              right: 6px;
+              border-radius: 12px;
+            }
+            .pkm-net-grid {
+              grid-template-columns: 1fr 1fr;
+              gap: 6px;
+            }
+            .pkm-metric {
+              min-height: 52px;
+              padding: 7px;
+            }
+            .pkm-metric .v {
+              font-size: 15px;
+            }
+            #pkm-net-canvas {
+              height: 68px;
+            }
+            #pkm-feed-list {
+              max-height: 66px;
+            }
+            .pkm-diag {
+              display: none;
+            }
+          }
+
+          @media (prefers-reduced-motion: reduce) {
+            #pkm-net-hud::before,
+            .pkm-node-dot,
+            .pkm-net-scan,
+            .pkm-feed-item,
+            .pkm-metric .v,
+            body.pkm-telemetry-spike .pkm-v3-cg {
+              animation: none !important;
+              transition: none !important;
+            }
+          }
+        `
+
+        const style = document.createElement('style')
+        style.id = 'pkm-net-hud-css'
+        style.textContent = css
+        document.head.appendChild(style)
+
+        if (!document.getElementById('pkm-net-hud')) {
+          const hud = document.createElement('aside')
+          hud.id = 'pkm-net-hud'
+          hud.setAttribute('aria-label', 'Global Signal Network Telemetry')
+          hud.innerHTML = [
+            '<div class="pkm-net-head">',
+            '<span class="label">GLOBAL SIGNAL NETWORK</span>',
+            '<span class="pkm-node-status"><span class="pkm-node-dot"></span>NODE STATUS: ACTIVE</span>',
+            '</div>',
+            '<div class="pkm-net-grid">',
+            '<div class="pkm-metric"><span class="k">ACTIVE IMPRESSIONS</span><span class="v" id="pkm-m-impressions">18,204</span></div>',
+            '<div class="pkm-metric"><span class="k">LIVE CONNECTIONS</span><span class="v" id="pkm-m-live">12</span></div>',
+            '<div class="pkm-metric"><span class="k">RETURNING VISITORS</span><span class="v" id="pkm-m-return">34<span class="u">%</span></span></div>',
+            '<div class="pkm-metric"><span class="k">SYSTEM STATUS</span><span class="v" id="pkm-m-status">ONLINE</span></div>',
+            '</div>',
+            '<div class="pkm-net-viz-wrap"><canvas id="pkm-net-canvas" width="320" height="88"></canvas></div>',
+            '<div class="pkm-feed">',
+            '<div class="pkm-feed-head">VISITOR SIGNAL FEED</div>',
+            '<div id="pkm-feed-list"></div>',
+            '</div>',
+            '<div class="pkm-diag">',
+            '<p>Render FPS: <span class="vv" id="pkm-d-fps">120</span></p>',
+            '<p>System Latency: <span class="vv" id="pkm-d-lat">12ms</span></p>',
+            '<p>Node Response: <span class="vv" id="pkm-d-resp">99.2%</span></p>',
+            '<p>Signal Uptime: <span class="vv" id="pkm-d-up">STABLE</span></p>',
+            '</div>',
+            '<div class="pkm-net-scan"></div>'
+          ].join('')
+          document.body.appendChild(hud)
+        }
+
+        const q = (id) => document.getElementById(id)
+        const hud = q('pkm-net-hud')
+        const impressionsEl = q('pkm-m-impressions')
+        const liveEl = q('pkm-m-live')
+        const returnEl = q('pkm-m-return')
+        const feedEl = q('pkm-feed-list')
+        const fpsEl = q('pkm-d-fps')
+        const latEl = q('pkm-d-lat')
+        const respEl = q('pkm-d-resp')
+
+        const regions = ['HARARE', 'JOHANNESBURG', 'UK', 'BOTSWANA', 'NAIROBI', 'LUSAKA', 'CAPE TOWN', 'DAR ES SALAAM']
+        const feedVerbs = ['NEW SIGNAL', 'NODE CONNECTED', 'RETURN CONNECTION', 'SESSION LINKED', 'ROUTE VERIFIED']
+
+        const state = {
+          impressions: 18204,
+          live: 12,
+          returning: 34,
+          fps: 120,
+          latency: 12,
+          response: 99.2
+        }
+
+        function formatNumber(n) {
+          return Math.round(n).toLocaleString('en-US')
+        }
+
+        function animateValue(el, from, to, duration, formatter) {
+          if (!el) return
+          if (prefersReducedMotion) {
+            el.textContent = formatter(to)
+            return
+          }
+          const start = performance.now()
+          const ease = (t) => 1 - Math.pow(1 - t, 3)
+          function frame(now) {
+            const p = Math.min(1, (now - start) / duration)
+            const v = from + (to - from) * ease(p)
+            el.textContent = formatter(v)
+            if (p < 1) requestAnimationFrame(frame)
+          }
+          requestAnimationFrame(frame)
+        }
+
+        function flashMetric(el) {
+          if (!el) return
+          el.classList.add('live')
+          setTimeout(() => el.classList.remove('live'), 280)
+        }
+
+        function pulseEnvironment() {
+          document.body.classList.add('pkm-telemetry-spike')
+          setTimeout(() => document.body.classList.remove('pkm-telemetry-spike'), 450)
+        }
+
+        function addFeed(message) {
+          if (!feedEl) return
+          const item = document.createElement('div')
+          item.className = 'pkm-feed-item'
+          item.textContent = message
+          feedEl.prepend(item)
+          const items = feedEl.querySelectorAll('.pkm-feed-item')
+          items.forEach((n, i) => {
+            n.classList.toggle('dim', i > 2)
+          })
+          while (feedEl.children.length > 6) {
+            feedEl.removeChild(feedEl.lastElementChild)
+          }
+        }
+
+        function randomFeedEvent() {
+          const verb = feedVerbs[Math.floor(Math.random() * feedVerbs.length)]
+          const region = regions[Math.floor(Math.random() * regions.length)]
+          addFeed(verb + ' - ' + region)
+        }
+
+        function tickMetrics() {
+          const oldImpressions = state.impressions
+          const oldLive = state.live
+          const oldReturning = state.returning
+
+          state.impressions += Math.random() < 0.72 ? (1 + Math.floor(Math.random() * 3)) : 0
+          state.live = Math.max(6, Math.min(48, state.live + (Math.random() < 0.5 ? -1 : 1) * (Math.random() < 0.45 ? 1 : 0)))
+          state.returning = Math.max(22, Math.min(61, state.returning + (Math.random() < 0.5 ? -1 : 1) * (Math.random() < 0.3 ? 1 : 0)))
+
+          if (state.impressions !== oldImpressions) {
+            animateValue(impressionsEl, oldImpressions, state.impressions, 560, formatNumber)
+            flashMetric(impressionsEl)
+            pulseEnvironment()
+          }
+          if (state.live !== oldLive) {
+            animateValue(liveEl, oldLive, state.live, 420, (v) => String(Math.round(v)))
+            flashMetric(liveEl)
+          }
+          if (state.returning !== oldReturning) {
+            animateValue(returnEl, oldReturning, state.returning, 440, (v) => String(Math.round(v)) + '%')
+            flashMetric(returnEl)
+          }
+
+          state.fps = Math.max(90, Math.min(165, state.fps + (Math.random() * 12 - 6)))
+          state.latency = Math.max(8, Math.min(42, state.latency + (Math.random() * 4 - 2)))
+          state.response = Math.max(97.6, Math.min(99.9, state.response + (Math.random() * 0.4 - 0.2)))
+
+          if (fpsEl) fpsEl.textContent = String(Math.round(state.fps))
+          if (latEl) latEl.textContent = String(Math.round(state.latency)) + 'ms'
+          if (respEl) respEl.textContent = state.response.toFixed(1) + '%'
+
+          if (Math.random() < 0.68) randomFeedEvent()
+        }
+
+        function setupViz() {
+          const canvas = q('pkm-net-canvas')
+          if (!canvas) return
+          const ctx = canvas.getContext('2d')
+          if (!ctx) return
+
+          const dpr = Math.min(window.devicePixelRatio || 1, 2)
+          const resize = () => {
+            const w = canvas.clientWidth || 320
+            const h = canvas.clientHeight || 88
+            canvas.width = Math.floor(w * dpr)
+            canvas.height = Math.floor(h * dpr)
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+          }
+          resize()
+          window.addEventListener('resize', resize)
+
+          const nodes = Array.from({ length: 10 }, () => ({
+            x: 8 + Math.random() * 300,
+            y: 8 + Math.random() * 72,
+            r: 1.8 + Math.random() * 2.3,
+            phase: Math.random() * Math.PI * 2
+          }))
+          const links = []
+          for (let i = 0; i < nodes.length - 1; i++) {
+            links.push([i, i + 1])
+            if (i + 2 < nodes.length && Math.random() < 0.5) links.push([i, i + 2])
+          }
+          let t = 0
+
+          function draw() {
+            t += prefersReducedMotion ? 0.015 : 0.028
+            const w = canvas.clientWidth || 320
+            const h = canvas.clientHeight || 88
+            ctx.clearRect(0, 0, w, h)
+
+            ctx.fillStyle = 'rgba(6, 14, 28, .6)'
+            ctx.fillRect(0, 0, w, h)
+
+            ctx.strokeStyle = 'rgba(34, 211, 238, .22)'
+            ctx.lineWidth = 1
+            links.forEach(([a, b], i) => {
+              const n1 = nodes[a]
+              const n2 = nodes[b]
+              ctx.globalAlpha = 0.3 + 0.35 * Math.sin(t * 1.8 + i)
+              ctx.beginPath()
+              ctx.moveTo(n1.x, n1.y)
+              ctx.lineTo(n2.x, n2.y)
+              ctx.stroke()
+            })
+
+            nodes.forEach((n, i) => {
+              const pulse = 0.35 + 0.65 * Math.abs(Math.sin(t * 2.2 + n.phase))
+              ctx.globalAlpha = .95
+              ctx.fillStyle = i % 4 === 0 ? 'rgba(139, 92, 246, .95)' : 'rgba(34, 211, 238, .95)'
+              ctx.beginPath()
+              ctx.arc(n.x, n.y, n.r + pulse * 1.3, 0, Math.PI * 2)
+              ctx.fill()
+            })
+
+            const waveX = ((t * 48) % (w + 42)) - 42
+            const grad = ctx.createLinearGradient(waveX, 0, waveX + 42, 0)
+            grad.addColorStop(0, 'rgba(34, 211, 238, 0)')
+            grad.addColorStop(.5, 'rgba(34, 211, 238, .42)')
+            grad.addColorStop(1, 'rgba(34, 211, 238, 0)')
+            ctx.fillStyle = grad
+            ctx.fillRect(0, 0, w, h)
+
+            ctx.globalAlpha = 1
+            if (!prefersReducedMotion) requestAnimationFrame(draw)
+          }
+
+          draw()
+        }
+
+        function setupSupabaseRealtime() {
+          const cfg = window.__PKM_TELEMETRY || {}
+          if (!cfg.url || !cfg.anonKey || !cfg.table) return
+
+          const scriptId = 'pkm-supabase-js'
+          const start = () => {
+            if (!window.supabase || !window.supabase.createClient) return
+            const client = window.supabase.createClient(cfg.url, cfg.anonKey)
+
+            client
+              .channel('pkm-telemetry-live')
+              .on('postgres_changes', { event: 'INSERT', schema: 'public', table: cfg.table }, (payload) => {
+                const row = payload && payload.new ? payload.new : {}
+                if (typeof row.total_views === 'number') state.impressions = row.total_views
+                if (typeof row.live_connections === 'number') state.live = row.live_connections
+                if (typeof row.returning_rate === 'number') state.returning = Math.round(row.returning_rate)
+                if (typeof row.region === 'string' && row.region) {
+                  addFeed('SESSION LINKED - ' + row.region.toUpperCase())
+                }
+                if (impressionsEl) impressionsEl.textContent = formatNumber(state.impressions)
+                if (liveEl) liveEl.textContent = String(state.live)
+                if (returnEl) returnEl.textContent = String(state.returning) + '%'
+                pulseEnvironment()
+              })
+              .subscribe()
+          }
+
+          if (window.supabase && window.supabase.createClient) {
+            start()
+            return
+          }
+
+          if (!document.getElementById(scriptId)) {
+            const s = document.createElement('script')
+            s.id = scriptId
+            s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'
+            s.async = true
+            s.onload = start
+            document.head.appendChild(s)
+          }
+        }
+
+        if (impressionsEl) impressionsEl.textContent = formatNumber(state.impressions)
+        if (liveEl) liveEl.textContent = String(state.live)
+        if (returnEl) returnEl.textContent = String(state.returning) + '%'
+
+        randomFeedEvent()
+        randomFeedEvent()
+        randomFeedEvent()
+
+        setupViz()
+        setupSupabaseRealtime()
+        setInterval(tickMetrics, prefersReducedMotion ? 3200 : 1800)
+
+        if (hud) {
+          hud.addEventListener('mouseenter', () => document.body.classList.add('pkm-telemetry-spike'))
+          hud.addEventListener('mouseleave', () => document.body.classList.remove('pkm-telemetry-spike'))
+
+          let hudVisible = true
+          setInterval(() => {
+            hudVisible = !hudVisible
+            hud.classList.toggle('pkm-net-hidden', !hudVisible)
+          }, 30000)
+        }
       })()
     </script>
 
