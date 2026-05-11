@@ -899,6 +899,61 @@
       })()
     </script>
 
+    <script>
+      (() => {
+        if (window.__pkmTerminalCloseX) return
+        window.__pkmTerminalCloseX = true
+
+        if (!document.getElementById('pkm-terminal-close-css')) {
+          const style = document.createElement('style')
+          style.id = 'pkm-terminal-close-css'
+          style.textContent =
+            '[data-terminal] [aria-label="Close terminal"], [data-terminal] .pkm-terminal-close-x {' +
+            'width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;' +
+            'border:1px solid rgba(34,211,238,.35);border-radius:999px;background:rgba(2,6,23,.65);' +
+            'color:rgba(103,232,249,.95);font-size:13px;line-height:1;font-weight:700;cursor:pointer;' +
+            'transition:all .2s ease;flex-shrink:0;' +
+            '}' +
+            '[data-terminal] [aria-label="Close terminal"]:hover, [data-terminal] .pkm-terminal-close-x:hover {' +
+            'background:rgba(8,47,73,.85);border-color:rgba(34,211,238,.7);color:#ecfeff;' +
+            '}'
+          document.head.appendChild(style)
+        }
+
+        function ensureCloseButton () {
+          const terminal = document.querySelector('[data-terminal]')
+          if (!terminal) return
+
+          const header = terminal.querySelector('.mb-2.flex.items-center.justify-between') || terminal.firstElementChild
+          if (!header) return
+
+          const existing = terminal.querySelector('[aria-label="Close terminal"]')
+          if (existing) {
+            existing.textContent = 'X'
+            existing.setAttribute('title', 'Close')
+            return
+          }
+
+          if (terminal.querySelector('.pkm-terminal-close-x')) return
+
+          const btn = document.createElement('button')
+          btn.type = 'button'
+          btn.className = 'pkm-terminal-close-x'
+          btn.setAttribute('aria-label', 'Close terminal')
+          btn.setAttribute('title', 'Close')
+          btn.textContent = 'X'
+          btn.addEventListener('click', function () {
+            terminal.style.display = 'none'
+          })
+          header.appendChild(btn)
+        }
+
+        ensureCloseButton()
+        window.addEventListener('load', ensureCloseButton)
+        new MutationObserver(ensureCloseButton).observe(document.body, { childList: true, subtree: true })
+      })()
+    </script>
+
   </body>
 </html>
 
