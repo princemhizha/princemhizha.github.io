@@ -523,19 +523,31 @@
 
         const targetName = 'Prince K Mhizha'
         const normalize = () => {
+          const isMobile = window.matchMedia('(max-width: 640px)').matches
           const nodes = document.querySelectorAll('h1, h2, h3, a, p, span, div')
           nodes.forEach((node) => {
             const txt = (node.textContent || '').replace(/\s+/g, ' ').trim()
             if (txt === targetName) {
               node.style.setProperty('letter-spacing', 'normal', 'important')
               node.style.setProperty('word-spacing', 'normal', 'important')
-              node.style.setProperty('white-space', 'normal', 'important')
+              node.style.setProperty('white-space', isMobile ? 'nowrap' : 'normal', 'important')
+
+              if (node.tagName === 'H1') {
+                if (isMobile) {
+                  node.style.setProperty('font-size', 'clamp(1.55rem, 8.2vw, 2.2rem)', 'important')
+                  node.style.setProperty('line-height', '1.08', 'important')
+                } else {
+                  node.style.removeProperty('font-size')
+                  node.style.removeProperty('line-height')
+                }
+              }
             }
           })
         }
 
         normalize()
         window.addEventListener('load', normalize)
+        window.addEventListener('resize', normalize)
         new MutationObserver(normalize).observe(document.body, { childList: true, subtree: true, characterData: true })
       })()
     </script>
