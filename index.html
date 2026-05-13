@@ -34,6 +34,33 @@
         hud.style.color = 'rgba(186, 230, 253, 0.95)'
         hud.style.pointerEvents = 'none'
 
+        const applyHudResponsiveLayout = () => {
+          const isMobile = window.matchMedia('(max-width: 640px)').matches
+          if (isMobile) {
+            hud.style.left = '8px'
+            hud.style.right = '8px'
+            hud.style.top = 'auto'
+            hud.style.bottom = '8px'
+            hud.style.width = 'auto'
+            hud.style.maxWidth = 'calc(100vw - 16px)'
+            hud.style.padding = '8px 10px'
+            hud.style.fontSize = '10px'
+            hud.style.lineHeight = '1.4'
+          } else {
+            hud.style.left = 'auto'
+            hud.style.right = '16px'
+            hud.style.top = '16px'
+            hud.style.bottom = 'auto'
+            hud.style.width = '220px'
+            hud.style.maxWidth = '220px'
+            hud.style.padding = '10px 12px'
+            hud.style.fontSize = '11px'
+            hud.style.lineHeight = '1.5'
+          }
+        }
+        applyHudResponsiveLayout()
+        window.addEventListener('resize', applyHudResponsiveLayout)
+
         const title = document.createElement('div')
         title.textContent = 'SYSTEM HUD'
         title.style.fontWeight = '700'
